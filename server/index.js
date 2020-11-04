@@ -10,12 +10,17 @@ const port = process.env.PORT || 5000;
 const Message = require('./Message');
 const mongoose = require('mongoose');
 
+const usersRouter = require('./api/routes/users');
+
 mongoose.connect(uri, {
   useUnifiedTopology: true,
   useNewUrlParser: true,
 });
 
+app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'client', 'build')));
+
+app.use('/api/users', usersRouter);
 
 io.on('connection', (socket) => {
 

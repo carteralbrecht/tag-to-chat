@@ -16,3 +16,7 @@ body {
 .content {
   margin-bottom: 8px;
 }
+
+.formContainer {
+  width: '100%';
+}

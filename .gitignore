@@ -18,6 +18,9 @@
 .env.test.local
 .env.production.local
 
+#intellij
+/.idea
+
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

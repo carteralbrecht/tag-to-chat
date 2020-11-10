@@ -1,14 +1,15 @@
-import React from 'react';
+import React, { Component } from 'react';
 import config from './config';
 import io from 'socket.io-client';
 
-import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
+import { withOktaAuth } from '@okta/okta-react';
+
+import { Container, Paper, Typography} from '@material-ui/core';
 
 import BottomBar from './BottomBar';
-import './App.css';
+import './css/Chat.css';
 
-class App extends React.Component {
+class Chat extends Component {
   constructor(props) {
     super(props);
 
@@ -82,31 +83,34 @@ class App extends React.Component {
 
   render() {
     return (
-      <div className="App">
-        <Paper id="chat" elevation={3}>
-          {this.state.chat.map((el, index) => {
-            return (
-              <div key={index}>
-                <Typography variant="caption" className="name">
-                  {el.name}
-                </Typography>
-                <Typography variant="body1" className="content">
-                  {el.content}
-                </Typography>
-              </div>
-            );
-          })}
-        </Paper>
-        <BottomBar
-          content={this.state.content}
-          handleContent={this.handleContent.bind(this)}
-          handleName={this.handleName.bind(this)}
-          handleSubmit={this.handleSubmit.bind(this)}
-          name={this.state.name}
-        />
-      </div>
+      <Container maxWidth="lg" style={{marginTop: '5rem'}}>
+          <div className="Chat">
+            <Paper id="chat" elevation={3}>
+              {this.state.chat.map((el, index) => {
+                return (
+                  <div key={index}>
+                    <Typography variant="caption" className="name">
+                      {el.name}
+                    </Typography>
+                    <Typography variant="body1" className="content">
+                      {el.content}
+                    </Typography>
+                  </div>
+                );
+              })}
+            </Paper>
+            <BottomBar
+              content={this.state.content}
+              handleContent={this.handleContent.bind(this)}
+              handleName={this.handleName.bind(this)}
+              handleSubmit={this.handleSubmit.bind(this)}
+              name={this.state.name}
+            />
+          </div>
+      </Container>
+      
     );
   }
 };
 
-export default App;
+export default withOktaAuth(Chat);

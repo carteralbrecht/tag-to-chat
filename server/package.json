@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@okta/okta-sdk-nodejs": "^4.2.0",
     "express": "^4.17.1",
     "mongoose": "^5.10.11",
     "socket.io": "^2.3.0"

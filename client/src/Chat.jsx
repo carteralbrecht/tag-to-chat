@@ -9,7 +9,19 @@ import { Container, Paper, Typography} from '@material-ui/core';
 import BottomBar from './BottomBar';
 import './css/Chat.css';
 
+async function checkUser() {
+  if (this.props.authState.isAuthenticated && !this.state.userInfo) {
+    const userInfo = await this.props.authService.getUser();
+    if (this._isMounted) {
+      this.setState({
+        userInfo: userInfo,
+      });
+    }
+  }
+}
+
 class Chat extends Component {
+  _isMounted = false;
   constructor(props) {
     super(props);
 
@@ -17,10 +29,15 @@ class Chat extends Component {
       chat: [],
       content: '',
       name: '',
+      userInfo: null,
     };
+
+    this.checkUser = checkUser.bind(this);
   }
 
   componentDidMount() {
+    this._isMounted = true;
+    this.checkUser();
     this.socket = io(config[process.env.NODE_ENV].endpoint);
 
     // Load the last 10 messages in the window.
@@ -105,6 +122,7 @@ class Chat extends Component {
               handleName={this.handleName.bind(this)}
               handleSubmit={this.handleSubmit.bind(this)}
               name={this.state.name}
+              nickname={this.state.userInfo.nickname}
             />
           </div>
       </Container>

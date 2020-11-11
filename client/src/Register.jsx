@@ -8,6 +8,7 @@ class Register extends Component {
     super(props);
     
     this.state = {
+      nickName: '',
       email: '',
       password: '',
       passwordDup: '',
@@ -22,11 +23,15 @@ class Register extends Component {
     });
 
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleNickNameChange = this.handleNickNameChange.bind(this);
     this.handleEmailChange = this.handleEmailChange.bind(this);
     this.handlePasswordChange = this.handlePasswordChange.bind(this);
     this.handlePasswordDupChange = this.handlePasswordDupChange.bind(this);
   }
 
+  handleNickNameChange(e) {
+    this.setState({ nickName: e.target.value });
+  }
   handleEmailChange(e) {
     this.setState({ email: e.target.value });
   }
@@ -99,6 +104,12 @@ class Register extends Component {
               <FormControl style={{width: '100%'}}>
                 <InputLabel htmlFor="email">Email address</InputLabel>
                 <Input id="email" type="text" value={this.state.email} onChange={this.handleEmailChange}/>
+              </FormControl>
+            </div>
+            <div>
+              <FormControl style={{width: '100%'}}>
+                <InputLabel htmlFor="nickName">Nickname</InputLabel>
+                <Input id="nickName" type="text" value={this.state.nickName} onChange={this.handleNickNameChange}/>
               </FormControl>
             </div>
             <div>

@@ -7,7 +7,8 @@ router.post('/create', async (req, res, next) => {
   const newUser = {
     profile: {
       email: req.body.email,
-      login: req.body.email
+      login: req.body.email,
+      nickName: req.body.nickName,
     },
     credentials: {
       password: {

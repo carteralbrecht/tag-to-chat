@@ -25,7 +25,7 @@ const useStyles = makeStyles(theme => ({
     position: 'relative',
     width: '100%',
   },
-  nickName: {
+  nickname: {
     borderRadius: theme.shape.borderRadius,
     marginLeft: theme.spacing(1),
     position: 'relative',
@@ -51,14 +51,13 @@ const useStyles = makeStyles(theme => ({
 
 export default function BottomBar(props) {
   const classes = useStyles();
-  console.log(props);
 
   return (
     <AppBar position="fixed" className={classes.appBar}>
       <Toolbar>
-        <div className={classes.nickName} style={{maxWidth: '200px'}}>
+        <div className={classes.nickname} style={{maxWidth: '200px'}}>
           <Typography>
-              Chat App
+            {props.nickname}
           </Typography>
         </div>
         <div className={classes.inputContainer}>

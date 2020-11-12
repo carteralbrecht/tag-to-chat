@@ -9,18 +9,44 @@ import { Container, Paper, Typography} from '@material-ui/core';
 import BottomBar from './BottomBar';
 import './css/Chat.css';
 
+async function checkUser() {
+  if (this.props.authState.isAuthenticated && !this.state.nickname) {
+    const userInfo = await this.props.authService.getUser();
+    if (this._isMounted) {
+      this.setState({
+        nickname: userInfo.nickname,
+      });
+    }
+  }
+}
+
 class Chat extends Component {
+  _isMounted = false;
   constructor(props) {
     super(props);
 
     this.state = {
       chat: [],
       content: '',
-      name: '',
+      nickname: '',
     };
+
+    this.checkUser = checkUser.bind(this);
   }
 
-  componentDidMount() {
+  async componentDidUpdate() {
+    this._isMounted = true;
+    this.checkUser();
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false;
+  }
+
+  async componentDidMount() {
+    this._isMounted = true;
+    this.checkUser();
+
     this.socket = io(config[process.env.NODE_ENV].endpoint);
 
     // Load the last 10 messages in the window.
@@ -46,20 +72,13 @@ class Chat extends Component {
     });
   }
 
-  //
-  handleName(event) {
-    this.setState({
-      name: event.target.value,
-    });
-  }
-
   handleSubmit(event) {
     // Prevent the form to reload the current page.
     event.preventDefault();
 
     // Send the new message to the server.
     this.socket.emit('message', {
-      name: this.state.name,
+      name: this.state.nickname,
       content: this.state.content,
     });
 
@@ -67,7 +86,7 @@ class Chat extends Component {
       // Update the chat with the user's message and remove the current message.
       return {
         chat: [...state.chat, {
-          name: state.name,
+          name: state.nickname,
           content: state.content,
         }],
         content: '',
@@ -102,9 +121,8 @@ class Chat extends Component {
             <BottomBar
               content={this.state.content}
               handleContent={this.handleContent.bind(this)}
-              handleName={this.handleName.bind(this)}
               handleSubmit={this.handleSubmit.bind(this)}
-              name={this.state.name}
+              nickname={this.state.nickname}
             />
           </div>
       </Container>

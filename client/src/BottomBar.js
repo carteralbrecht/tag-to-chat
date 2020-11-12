@@ -7,6 +7,8 @@ import Toolbar from '@material-ui/core/Toolbar';
 
 import ChatIcon from '@material-ui/icons/Chat';
 import FaceIcon from '@material-ui/icons/Face';
+import {TextArea} from "semantic-ui-react";
+import {Typography} from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
   appBar: {
@@ -18,6 +20,12 @@ const useStyles = makeStyles(theme => ({
     '&:hover': {
       backgroundColor: fade(theme.palette.common.white, 0.25),
     },
+    borderRadius: theme.shape.borderRadius,
+    marginLeft: theme.spacing(1),
+    position: 'relative',
+    width: '100%',
+  },
+  nickname: {
     borderRadius: theme.shape.borderRadius,
     marginLeft: theme.spacing(1),
     position: 'relative',
@@ -47,20 +55,10 @@ export default function BottomBar(props) {
   return (
     <AppBar position="fixed" className={classes.appBar}>
       <Toolbar>
-        <div className={classes.inputContainer} style={{maxWidth: '200px'}}>
-          <div className={classes.icon}>
-            <FaceIcon />
-          </div>
-          <InputBase
-            onChange={props.handleName}
-            value={props.name}
-            placeholder="Name"
-            classes={{
-              root: classes.inputRoot,
-              input: classes.inputInput,
-            }}
-            inputProps={{ 'aria-label': 'name' }}
-          />
+        <div className={classes.nickname} style={{maxWidth: '200px'}}>
+          <Typography>
+            {props.nickname}
+          </Typography>
         </div>
         <div className={classes.inputContainer}>
           <form onSubmit={props.handleSubmit}>

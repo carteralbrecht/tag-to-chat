@@ -9,8 +9,15 @@ router.post('/create', async (req, res, next) => {
     }
 
     const roomToCreate = new Room({
-        name: req.body.name
+        name: req.body.name,
+        users: [],
+        createdBy: req.body.id,
     });
+
+    roomToCreate.users.push({
+        id: req.body.id,
+        active: false
+    })
 
     roomToCreate
         .save(roomToCreate)

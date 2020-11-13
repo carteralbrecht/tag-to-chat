@@ -26,13 +26,20 @@ app.use('/api/rooms', roomsRouter);
 
 io.on('connection', (socket) => {
 
-  // Get the last 10 messages from the database.
-  Message.find().sort({createdAt: -1}).limit(10).exec((err, messages) => {
-    if (err) return console.error(err);
+  socket.on('joinRoom', (room) => {
 
-    // Send the last messages to the user.
-    socket.emit('init', messages);
-  });
+    socket.join(room);
+
+    // Get the last 10 messages from the database.
+    Message.find().sort({createdAt: -1}).limit(10).exec((err, messages) => {
+      if (err) return console.error(err);
+
+      // Send the last messages to the user.
+      socket.emit('init', messages);
+    });
+
+  })
+
 
   // Listen to connected users for a new message.
   socket.on('message', (msg) => {

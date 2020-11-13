@@ -11,6 +11,7 @@ const Message = require('./Message');
 const mongoose = require('mongoose');
 
 const usersRouter = require('./api/routes/users');
+const roomsRouter = require('./api/routes/rooms')
 
 mongoose.connect(uri, {
   useUnifiedTopology: true,
@@ -21,6 +22,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'client', 'build')));
 
 app.use('/api/users', usersRouter);
+app.use('/api/rooms', roomsRouter);
 
 io.on('connection', (socket) => {
 

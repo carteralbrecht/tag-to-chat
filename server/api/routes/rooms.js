@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Room = require ("../../Room")
+const Room = require ("../../models/Room");
 
 // create a room
 router.post('/create', async (req, res, next) => {

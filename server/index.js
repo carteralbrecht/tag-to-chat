@@ -7,10 +7,11 @@ const io = require('socket.io')(http);
 const uri = process.env.MONGODB_URI;
 const port = process.env.PORT || 5000;
 
-const Message = require('./Message');
+const Message = require('./models/Message');
 const mongoose = require('mongoose');
 
 const usersRouter = require('./api/routes/users');
+const roomsRouter = require('./api/routes/rooms')
 
 mongoose.connect(uri, {
   useUnifiedTopology: true,
@@ -21,16 +22,24 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'client', 'build')));
 
 app.use('/api/users', usersRouter);
+app.use('/api/rooms', roomsRouter);
 
 io.on('connection', (socket) => {
 
-  // Get the last 10 messages from the database.
-  Message.find().sort({createdAt: -1}).limit(10).exec((err, messages) => {
-    if (err) return console.error(err);
+  socket.on('joinRoom', (room) => {
 
-    // Send the last messages to the user.
-    socket.emit('init', messages);
-  });
+    socket.join(room);
+
+    // Get the last 10 messages from the database.
+    Message.find({room: room}).sort({createdAt: -1}).limit(10).exec((err, messages) => {
+      if (err) return console.error(err);
+
+      // Send the last messages to the user.
+      socket.emit('init', messages);
+    });
+
+  })
+
 
   // Listen to connected users for a new message.
   socket.on('message', (msg) => {
@@ -38,6 +47,7 @@ io.on('connection', (socket) => {
     const message = new Message({
       content: msg.content,
       name: msg.name,
+      room: msg.room,
     });
 
     // Save the message to the database.
@@ -45,8 +55,9 @@ io.on('connection', (socket) => {
       if (err) return console.error(err);
     });
 
-    // Notify all other users about a new message.
-    socket.broadcast.emit('push', msg);
+    // push to all in the room except self
+    //https://stackoverflow.com/questions/10058226/send-response-to-all-clients-except-sender
+    socket.broadcast.in(msg.room).emit('push', msg)
   });
 });
 

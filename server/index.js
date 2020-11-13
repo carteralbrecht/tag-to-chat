@@ -55,8 +55,9 @@ io.on('connection', (socket) => {
       if (err) return console.error(err);
     });
 
-    // Push msg to all in room
-    io.in(msg.room).emit('push', msg)
+    // push to all in the room except self
+    //https://stackoverflow.com/questions/10058226/send-response-to-all-clients-except-sender
+    socket.broadcast.in(msg.room).emit('push', msg)
   });
 });
 

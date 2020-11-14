@@ -2,6 +2,10 @@ const express = require('express');
 const router = express.Router();
 const Room = require ("../../models/Room");
 
+// TODO: Everything shouldn't be a post
+// TODO: Better Responses
+// TODO: Edge Cases and Error Handling
+
 // create a room
 router.post('/create', async (req, res, next) => {
     if (!req.body) {
@@ -27,6 +31,20 @@ router.post('/create', async (req, res, next) => {
         .catch(err => {
             res.sendStatus(500);
         });
+});
+
+// delete room
+router.post('/delete/:id', async (req, res, next) => {
+    if (!req.body) {
+        return res.sendStatus(400);
+    }
+
+    try {
+        await Room.deleteOne({ _id: req.params.id })
+        return res.sendStatus(204);
+    } catch {
+        return res.sendStatus(404);
+    }
 });
 
 // leave a user from room

@@ -30,7 +30,7 @@ router.post('/create', async (req, res, next) => {
 });
 
 // leave a user from room
-// (mark not active)
+// (mark as not active)
 router.post('/leaveUser/:id', async (req, res, next) => {
     if (!req.body) {
         return res.sendStatus(400);
@@ -92,6 +92,30 @@ router.post('/addUser/:id', async (req, res, next) => {
 
     const update = {
         $addToSet: {users: {id: req.body.id, active: false}}
+    };
+
+    Room.findOneAndUpdate(conditions, update, {new: true}, (err, room) => {
+        if (err)
+            res.send(err);
+        else
+            res.send(room);
+    });
+
+});
+
+// remove user from room
+router.post('/removeUser/:id', async (req, res, next) => {
+    if (!req.body) {
+        return res.sendStatus(400);
+    }
+
+    const conditions = {
+        _id: req.params.id,
+        'users.id': req.body.id
+    };
+
+    const update = {
+        $pull: {users: {id: req.body.id}}
     };
 
     Room.findOneAndUpdate(conditions, update, {new: true}, (err, room) => {

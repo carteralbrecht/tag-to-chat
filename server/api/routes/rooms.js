@@ -29,4 +29,28 @@ router.post('/create', async (req, res, next) => {
         });
 });
 
+// add user to room
+router.post('/addUser/:id', async (req, res, next) => {
+    if (!req.body) {
+        return res.sendStatus(400);
+    }
+
+    const conditions = {
+        _id: req.params.id,
+        'users.id': {$ne: req.body.id}
+    };
+
+    const update = {
+        $addToSet: {users: {id: req.body.id, active: false}}
+    };
+
+    Room.findOneAndUpdate(conditions, update, {new: true}, (err, room) => {
+        if (err)
+            res.send(err);
+        else
+            res.send(room);
+    });
+
+});
+
 module.exports = router;

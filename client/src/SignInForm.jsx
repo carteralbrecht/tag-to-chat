@@ -16,9 +16,7 @@ class SignInForm extends Component {
       forgotOpen: false
     };
 
-    this.oktaAuth = new OktaAuth({
-      issuer: props.issuer
-    });
+    this.oktaAuth = new OktaAuth({ issuer: props.issuer });
 
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleUsernameChange = this.handleUsernameChange.bind(this);
@@ -29,17 +27,12 @@ class SignInForm extends Component {
     this.handleForgotClose = this.handleForgotClose.bind(this);
   }
 
-  handleForgotOpen() {
-    this.setState({
-      forgotOpen: true
-    });
-  }
+  handleForgotOpen = () => this.setState({ forgotOpen: true });
+  handleForgotClose = () => this.setState({ forgotOpen: false });
 
-  handleForgotClose() {
-    this.setState({
-      forgotOpen: false
-    });
-  }
+  handleEmailChange = (e) => this.setState({ email: e.target.value });
+  handleUsernameChange = (e) => this.setState({ username: e.target.value });
+  handlePasswordChange = (e) => this.setState({ password: e.target.value });
 
   async handleForgot() {
     let response = await fetch('/api/users/forgot', {
@@ -52,9 +45,7 @@ class SignInForm extends Component {
     });
 
     if (response.status !== 200) {
-      return this.setState({
-        error: 'Error forgetting password'
-      });
+      return this.setState({ error: 'Error forgetting password' });
     }
 
     return this.setState({
@@ -65,44 +56,26 @@ class SignInForm extends Component {
 
   async handleSubmit(e) {
     e.preventDefault();
-    let response;
-    try {
-      response = await this.oktaAuth.signIn({
-        username: this.state.username,
-        password: this.state.password
-      });
-    } catch (err) {
-      return this.setState({ 
-        error: 'Authentication error' 
-      });
+
+    let response = await fetch('/api/users/login', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(this.state)
+    });
+
+    let body = await response.json();
+
+    if (response.status !== 200) {
+      return this.setState({ error: 'Error logging in' });
     }
 
-    const sessionToken = response.data.sessionToken;
-    this.setState({ 
-      sessionToken 
-    });
+    const sessionToken = body.sessionToken;
+    this.setState({ sessionToken });
 
-    this.props.authService.redirect({ 
-      sessionToken 
-    });
-  }
-
-  handleEmailChange(e) {
-    this.setState({ 
-      email: e.target.value 
-    });
-  }
-
-  handleUsernameChange(e) {
-    this.setState({ 
-      username: e.target.value 
-    });
-  }
-
-  handlePasswordChange(e) {
-    this.setState({ 
-      password: e.target.value 
-    });
+    this.props.authService.redirect({ sessionToken });
   }
 
   render() {

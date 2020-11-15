@@ -6,7 +6,11 @@
 # React Native Stack Base
 
 .expo
+.expo-shared
 __generated__
+
+# VS Code Settings
+.vscode
 
 ### ReactNative.Android Stack ###
 # Built application files
@@ -276,7 +280,8 @@ DerivedData/
 .LSOverride
 
 # Icon must end with two \r
-Icon
+Icon
+
 
 # Thumbnails
 ._*

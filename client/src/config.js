@@ -1,6 +1,6 @@
 import pkg from '../package.json';
 
-export default {
+const config = {
   development: {
     endpoint: pkg.proxy
   },
@@ -8,3 +8,5 @@ export default {
     endpoint: window.location.hostname
   }
 }
+
+export default config

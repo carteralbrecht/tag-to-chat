@@ -64,9 +64,9 @@ class Register extends Component {
     }
 
     let response = await fetch('/api/users/create', {
-      method: 'POST',
+      method: 'PUT',
       headers: {
-        Accept: 'application/json',
+        'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(this.state)

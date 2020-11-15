@@ -1,12 +1,16 @@
 const mongoose = require('mongoose');
+const messageSchema = require('./Message');
 
 const roomSchema = new mongoose.Schema({
-    name: String,
+    name: { type: String, unique: true, required: true },
+    ownerId: { type: String, required: true },
+    private: { type: Boolean, default: true },
+    joinCode: { type: String, unique: true, required: true },
     users: [{
-        id: String,
+        userId: String,
         active: Boolean
     }],
-    createdBy: String
+    messages: [ messageSchema ]
 }, {
     timestamps: true,
 });

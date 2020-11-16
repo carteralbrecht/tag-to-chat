@@ -13,6 +13,20 @@ class LoginScreen extends React.Component {
     password: "",
   };
 
+  // componentDidUpdate(prevState) {
+  //   if (
+  //     this.state.nickname !== prevState.nickname &&
+  //     this.state.password !== prevState.password
+  //   ) {
+  //     alert(
+  //       "nickname: ",
+  //       this.state.nickname,
+  //       "\npassword: ",
+  //       this.state.password
+  //     );
+  //   }
+  // }
+
   render() {
     return (
       <View style={styles.container}>
@@ -45,7 +59,15 @@ class LoginScreen extends React.Component {
         >
           <Text style={styles.loginText}>LOGIN</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => alert("Signup")}>
+        <TouchableOpacity
+          onPress={() =>
+            this.props.navigation.navigate(
+              "Register",
+              this.state.nickname,
+              this.state.password
+            )
+          }
+        >
           <Text style={styles.loginText}>Signup</Text>
         </TouchableOpacity>
       </View>

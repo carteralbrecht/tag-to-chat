@@ -3,6 +3,29 @@ const router = express.Router();
 const oktaClient = require('../lib/oktaClient');
 const got = require('got');
 
+router.post('/login', async (req, res) => {
+  if (!req.body) return res.sendStatus(400);
+
+  let response;
+  try {
+    response = await got.post('https://dev-1701617.okta.com/api/v1/authn', {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `SSWS ${process.env.OKTA_TOKEN}`
+      },
+      body: JSON.stringify({
+        username: req.body.username,
+        password: req.body.password
+      })
+    }).json();
+  } catch (err) {
+    return res.status(500).send(err);
+  }
+
+  return res.status(200).send({ sessionToken: response.sessionToken});
+});
+
 router.post('/forgot', async (req, res) => {
   if (!req.body) return res.sendStatus(400);
   const email = req.body.email;
@@ -26,7 +49,7 @@ router.post('/forgot', async (req, res) => {
       }
     }).json();
   } catch (err) {
-    return res.status(400).send(err);
+    return res.status(500).send(err);
   }
 
   return res.status(200).send();
@@ -50,7 +73,7 @@ router.put('/create', async (req, res) => {
   try {
     user = await oktaClient.createUser(newUser);
   } catch (err) {
-    return res.status(400).send(err);
+    return res.status(500).send(err);
   }
 
   return res.status(201).send(user);

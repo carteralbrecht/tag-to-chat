@@ -9,7 +9,7 @@ import {
 
 class LoginScreen extends React.Component {
   state = {
-    email: "",
+    nickname: "",
     password: "",
   };
 
@@ -22,7 +22,7 @@ class LoginScreen extends React.Component {
             style={styles.inputText}
             placeholder="Email..."
             placeholderTextColor="white"
-            onChangeText={(text) => this.setState({ email: text })}
+            onChangeText={(text) => this.setState({ nickname: text })}
           />
         </View>
         <View style={styles.inputView}>
@@ -40,12 +40,7 @@ class LoginScreen extends React.Component {
         <TouchableOpacity
           style={styles.loginBtn}
           onPress={() =>
-            alert(
-              "email: " +
-                this.state.email +
-                "\npassword: " +
-                this.state.password
-            )
+            this.props.navigation.navigate("Chat", this.state.nickname)
           }
         >
           <Text style={styles.loginText}>LOGIN</Text>

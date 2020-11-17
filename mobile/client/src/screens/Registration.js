@@ -24,31 +24,29 @@ class Reg extends React.Component {
     event.preventDefault();
 
     if (this.validate()) {
-      this.props.route.setParams({ nickname: this.state.nickname });
-      this.props.route.setParams({ password: this.state.password });
-      this.props.navigation.goBack();
+      this.props.navigation.navigate("Login");
     }
   }
 
   validate() {
     let isValid = true;
 
-    if (this.state.nickname == undefined) {
+    if (this.state.nickname == "") {
       isValid = false;
       alert("Please enter a username.");
     }
 
-    if (this.state.email == undefined) {
+    if (this.state.email == "") {
       isValid = false;
       alert("Please enter your email Address.");
     }
 
-    if (this.state.password == undefined) {
+    if (this.state.password == "") {
       isValid = false;
       alert("Please enter a password.");
     }
 
-    if (this.state.confirmPassword == undefined) {
+    if (this.state.confirmPassword == "") {
       isValid = false;
       alert("Please confirm your password.");
     }

@@ -10,7 +10,7 @@ const Stack = createStackNavigator();
 
 export const AppNavigator = () => (
   <NavigationContainer>
-    <Stack.Navigator headerMode="none">
+    <Stack.Navigator headerMode="none" initialRouteName="Login">
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="Register" component={Register} />
       <Stack.Screen name="Chat" component={Chat} />

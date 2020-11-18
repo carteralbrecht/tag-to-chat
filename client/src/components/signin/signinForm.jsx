@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { OktaAuth } from '@okta/okta-auth-js';
 import { withOktaAuth } from '@okta/okta-react';
-import { Paper, Button, Typography, Input, InputLabel, FormControl, Divider, Container } from '@material-ui/core';
+import { Paper, Button, Typography, Input, InputLabel, FormControl, Container } from '@material-ui/core';
 
 class SignInForm extends Component {
   constructor(props) {

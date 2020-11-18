@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import { Route, withRouter } from 'react-router-dom';
 
 import { Security, SecureRoute, LoginCallback } from '@okta/okta-react';
-import Home from './Home';
-import SignIn from './SignIn';
-import Chat from './Chat';
-import Navbar from './Navbar';
-import Register from './Register';
+import Home from '../home/home';
+import SignIn from '../signin/signin';
+import Chat from '../chat/chat';
+import Navbar from '../navbar/navbar';
+import Register from '../register/register';
 
 class AppRouter extends Component {
   constructor(props) {

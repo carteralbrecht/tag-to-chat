@@ -3,13 +3,15 @@ const router = express.Router();
 const Room = require ("../../models/Room");
 const {v4: uuidv4} = require('uuid');
 const oktaClient = require('../lib/oktaClient');
+const authenticateUser = require('../authMiddleware');
 
 // TODO: Everything shouldn't be a post
 // TODO: Better Responses
 // TODO: Edge Cases and Error Handling
 // create a room
-router.post('/create', async (req, res) => {
+router.post('/create', authenticateUser, async (req, res) => {
     if (!req.body) return res.sendStatus(400);
+
     const name = req.body.name;
     const email = req.body.email;
     const private = req.body.private;
@@ -66,11 +68,17 @@ router.post('/create', async (req, res) => {
 });
 
 // delete room
-router.delete('/delete/:id', async (req, res) => {
+router.delete('/delete/:roomId', authenticateUser, async (req, res) => {
     if (!req.body) return res.sendStatus(400);
 
+    const roomId = req.params.roomId;
+    const roomsOwned = res.locals.claims.roomsOwned;
+
+    // Check user claims before executing transaction
+    if (!roomsOwned || !roomsOwned.includes(roomId)) return res.sendStatus(403);
+
     try {
-        await Room.deleteOne({ _id: req.params.id })
+        await Room.deleteOne({ _id: roomId })
     } catch (err) {
         return res.sendStatus(404);
     }
@@ -80,17 +88,22 @@ router.delete('/delete/:id', async (req, res) => {
 
 // leave a user from room
 // (mark as not active)
-router.post('/leave/:id', async (req, res) => {
+router.post('/leave/:roomId', authenticateUser, async (req, res) => {
     if (!req.body) return res.sendStatus(400);
 
+    const roomId = req.params.roomId;
+    const userId = req.body.userId;
+    const roomsAdded = res.locals.claims.roomsAdded;
+
+    // Check user claims before executing transaction
+    if (!roomsAdded || !roomsAdded.includes(roomId)) return res.sendStatus(403);
+
     const conditions = {
-        _id: req.params.id,
-        'users.userId': req.body.id
+        _id: roomId,
+        'users.userId': userId
     };
 
-    const update = {
-        $set: {"users.$.active": false}
-    };
+    const update = { $set: { "users.$.active": false } };
 
     let room;
     try {
@@ -104,12 +117,19 @@ router.post('/leave/:id', async (req, res) => {
 
 // join a user to room
 // (mark as active)
-router.post('/join/:id', async (req, res) => {
+router.post('/join/:roomId', authenticateUser, async (req, res) => {
     if (!req.body) return res.sendStatus(400);
 
+    const roomId = req.params.roomId;
+    const userId = req.body.userId;
+    const roomsAdded = res.locals.claims.roomsAdded;
+
+    // Check user claims before executing transaction
+    if (!roomsAdded || !roomsAdded.includes(roomId)) return res.sendStatus(403);
+
     const conditions = {
-        _id: req.params.id,
-        'users.id': req.body.id
+        _id: roomId,
+        'users.id': userId
     };
 
     const update = {
@@ -127,17 +147,21 @@ router.post('/join/:id', async (req, res) => {
 });
 
 // add user to room
-router.post('/add/:id', async (req, res) => {
+router.post('/add/:roomId', authenticateUser, async (req, res) => {
     if (!req.body) return res.sendStatus(400);
 
+    const roomId = req.params.roomId;
+    const userId = req.body.userId;
+    const joinCode = req.body.joinCode;
+
     const conditions = {
-        _id: req.params.id,
-        joinCode: req.body.joinCode,
-        'users.id': {$ne: req.body.userId}
+        _id: roomId,
+        joinCode,
+        'users.id': {$ne: userId}
     };
 
     const update = {
-        $addToSet: {users: {userId: req.body.userId, active: false}}
+        $addToSet: {users: {userId, active: false}}
     };
 
     let room;
@@ -151,18 +175,22 @@ router.post('/add/:id', async (req, res) => {
 });
 
 // remove user from room
-router.delete('/remove/:id', async (req, res) => {
-    if (!req.body) {
-        return res.sendStatus(400);
-    }
+router.delete('/remove/:roomId', authenticateUser, async (req, res) => {
+    if (!req.body) return res.sendStatus(400);
+
+    const roomId = req.params.roomId;
+    const userId = req.body.userId;
+
+    // Check user claims before executing transaction
+    if (!res.locals.claims.roomsOwned.includes(roomId)) return res.sendStatus(403);
 
     const conditions = {
-        _id: req.params.id,
-        'users.id': req.body.id
+        _id: roomId,
+        'users.id': userId
     };
 
     const update = {
-        $pull: {users: {id: req.body.id}}
+        $pull: {users: { userId }}
     };
 
     let room;

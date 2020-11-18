@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
-import SignInForm from './SignInForm';
+import SignInForm from './signinForm';
 import { withOktaAuth } from '@okta/okta-react';
 
 class SignIn extends Component {

@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
-import config from './config';
+import config from '../../config';
 import io from 'socket.io-client';
 
 import { withOktaAuth } from '@okta/okta-react';
 
 import { Container, Paper, Typography} from '@material-ui/core';
 
-import BottomBar from './BottomBar';
-import './css/Chat.css';
+import BottomBar from './bottomBar';
+import './chat.css';
 
 async function checkUser() {
   if (this.props.authState.isAuthenticated && !this.state.nickname) {

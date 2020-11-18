@@ -9,9 +9,21 @@ import {
 
 class LoginScreen extends React.Component {
   state = {
-    email: "",
+    nickname: "",
     password: "",
   };
+
+  login() {
+    if (this.state.nickname == "") {
+      alert("Please enter your username");
+    }
+
+    if (this.state.password == "") {
+      alert("Please enter your password");
+    } else {
+      this.props.navigation.navigate("Chat", this.state.nickname);
+    }
+  }
 
   render() {
     return (
@@ -20,9 +32,9 @@ class LoginScreen extends React.Component {
         <View style={styles.inputView}>
           <TextInput
             style={styles.inputText}
-            placeholder="Email..."
+            placeholder="Username..."
             placeholderTextColor="white"
-            onChangeText={(text) => this.setState({ email: text })}
+            onChangeText={(text) => this.setState({ nickname: text })}
           />
         </View>
         <View style={styles.inputView}>
@@ -37,20 +49,12 @@ class LoginScreen extends React.Component {
         <TouchableOpacity onPress={() => alert("Forgot Password?")}>
           <Text style={styles.forgot}>Forgot Password?</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.loginBtn}
-          onPress={() =>
-            alert(
-              "email: " +
-                this.state.email +
-                "\npassword: " +
-                this.state.password
-            )
-          }
-        >
+        <TouchableOpacity style={styles.loginBtn} onPress={() => this.login()}>
           <Text style={styles.loginText}>LOGIN</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => alert("Signup")}>
+        <TouchableOpacity
+          onPress={() => this.props.navigation.navigate("Register")}
+        >
           <Text style={styles.loginText}>Signup</Text>
         </TouchableOpacity>
       </View>

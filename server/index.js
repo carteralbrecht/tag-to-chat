@@ -11,7 +11,7 @@ const Message = require('./models/Message');
 const mongoose = require('mongoose');
 
 const usersRouter = require('./api/routes/users');
-const roomsRouter = require('./api/routes/rooms')
+const roomsRouter = require('./api/routes/rooms');
 
 mongoose.connect(uri, {
   useUnifiedTopology: true,
@@ -25,20 +25,21 @@ app.use('/api/users', usersRouter);
 app.use('/api/rooms', roomsRouter);
 
 io.on('connection', (socket) => {
-
   socket.on('joinRoom', (room) => {
-
     socket.join(room);
 
     // Get the last 10 messages from the database.
-    Message.find({room: room}).sort({createdAt: -1}).limit(10).exec((err, messages) => {
-      if (err) return console.error(err);
+    Message
+        .find({room: room})
+        .sort({createdAt: -1})
+        .limit(10)
+        .exec((err, messages) => {
+          if (err) return console.error(err);
 
-      // Send the last messages to the user.
-      socket.emit('init', messages);
-    });
-
-  })
+          // Send the last messages to the user.
+          socket.emit('init', messages);
+        });
+  });
 
 
   // Listen to connected users for a new message.
@@ -56,8 +57,8 @@ io.on('connection', (socket) => {
     });
 
     // push to all in the room except self
-    //https://stackoverflow.com/questions/10058226/send-response-to-all-clients-except-sender
-    socket.broadcast.in(msg.room).emit('push', msg)
+    // https://stackoverflow.com/questions/10058226/send-response-to-all-clients-except-sender
+    socket.broadcast.in(msg.room).emit('push', msg);
   });
 });
 

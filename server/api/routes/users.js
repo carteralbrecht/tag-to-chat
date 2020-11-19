@@ -12,9 +12,9 @@ router.post('/create', async (req, res, next) => {
     },
     credentials: {
       password: {
-        value: req.body.password
-      }
-    }
+        value: req.body.password,
+      },
+    },
   };
   let user;
   try {

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Room = require ("../../models/Room");
+const Room = require('../../models/Room');
 const {v4: uuidv4} = require('uuid');
 const oktaClient = require('../lib/oktaClient');
 const authenticateUser = require('../authMiddleware');
@@ -10,58 +10,76 @@ const authenticateUser = require('../authMiddleware');
 // TODO: Edge Cases and Error Handling
 
 /*
+    - Gets all rooms
+    - Pulls from user authenticaion claims
+*/
+router.get('/', authenticateUser, async (req, res) => {
+  const roomsAdded = res.locals.claims.roomsAdded;
+
+  let rooms;
+  try {
+    rooms = await Room.find().where('_id').in(roomsAdded).exec();
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err);
+  }
+
+  return res.status(200).send(rooms);
+});
+
+/*
     - Creates a room
     - Called by user
 */
 router.post('/create', authenticateUser, async (req, res) => {
-    if (!req.body) return res.sendStatus(400);
+  if (!req.body) return res.sendStatus(400);
 
-    const name = req.body.name;
-    const email = req.body.email;
-    const private = req.body.private;
+  const name = req.body.name;
+  const email = req.body.email;
+  const private = req.body.private;
 
-    let user;
-    try {
-        user = await oktaClient.getUser(email);
-    } catch (err) {
-        return res.status(500).send(err);
-    }
+  let user;
+  try {
+    user = await oktaClient.getUser(email);
+  } catch (err) {
+    return res.status(500).send(err);
+  }
 
-    const ownerId = user.id;
+  const ownerId = user.id;
 
-    const roomToCreate = new Room({
-        name,
-        ownerId,
-        private,
-        joinCode: uuidv4(),
-        users: [],
-        messages: []
-    });
+  const roomToCreate = new Room({
+    name,
+    ownerId,
+    private,
+    joinCode: uuidv4(),
+    users: [],
+    messages: [],
+  });
 
-    roomToCreate.users.push({
-        userId: req.body.id,
-        active: false
-    });
+  roomToCreate.users.push({
+    userId: user.id,
+    active: false,
+  });
 
-    let data;
-    try {
-        data = await roomToCreate.save();
-    } catch (err) {
-        return res.status(500).send(err);
-    }
+  let data;
+  try {
+    data = await roomToCreate.save();
+  } catch (err) {
+    return res.status(500).send(err);
+  }
 
-    const roomId = data._id;
+  const roomId = data._id;
 
-    // Adds authentication claims to user
-    if (!user.profile.roomsOwned) user.profile.roomsOwned = [];
-    if (!user.profile.roomsAdded) user.profile.roomsAdded = [];
+  // Adds authentication claims to user
+  if (!user.profile.roomsOwned) user.profile.roomsOwned = [];
+  if (!user.profile.roomsAdded) user.profile.roomsAdded = [];
 
-    user.profile.roomsOwned.push(roomId);
-    user.profile.roomsAdded.push(roomId);
+  user.profile.roomsOwned.push(roomId);
+  user.profile.roomsAdded.push(roomId);
 
-    await user.update();
+  await user.update();
 
-    return res.status(200).send(data);
+  return res.status(200).send(data);
 });
 
 /*
@@ -69,19 +87,19 @@ router.post('/create', authenticateUser, async (req, res) => {
     - Called by room owner
 */
 router.get('/code/:roomId', authenticateUser, async (req, res) => {
-    const roomId = req.params.roomId;
-    const roomsOwned = res.locals.claims.roomsOwned;
+  const roomId = req.params.roomId;
+  const roomsOwned = res.locals.claims.roomsOwned;
 
-    // Check user claims before executing transaction
-    if (!roomsOwned || !roomsOwned.includes(roomId)) return res.sendStatus(403);
-    let room;
-    try {
-        room = await Room.findById(roomId);
-    } catch (err) {
-        return res.setStatus(500).send(err);
-    }
+  // Check user claims before executing transaction
+  if (!roomsOwned || !roomsOwned.includes(roomId)) return res.sendStatus(403);
+  let room;
+  try {
+    room = await Room.findById(roomId);
+  } catch (err) {
+    return res.status(500).send(err);
+  }
 
-    return res.status(200).json({ joinCode: room.joinCode });
+  return res.status(200).json({joinCode: room.joinCode});
 });
 
 /*
@@ -89,23 +107,23 @@ router.get('/code/:roomId', authenticateUser, async (req, res) => {
     - Called by room owner
 */
 router.post('/code/:roomId', authenticateUser, async (req, res) => {
-    const roomId = req.params.roomId;
-    const roomsOwned = res.locals.claims.roomsOwned;
+  const roomId = req.params.roomId;
+  const roomsOwned = res.locals.claims.roomsOwned;
 
-    // Check user claims before executing transaction
-    if (!roomsOwned || !roomsOwned.includes(roomId)) return res.sendStatus(403);
+  // Check user claims before executing transaction
+  if (!roomsOwned || !roomsOwned.includes(roomId)) return res.sendStatus(403);
 
-    const conditions = { _id: roomId };
-    const update = { $set: { "joinCode": uuidv4() } };
+  const conditions = {_id: roomId};
+  const update = {$set: {'joinCode': uuidv4()}};
 
-    let room;
-    try {
-        room = await Room.findOneAndUpdate(conditions, update, {new: true});
-    } catch (err) {
-        return res.status(500).send(err);
-    }
+  let room;
+  try {
+    room = await Room.findOneAndUpdate(conditions, update, {new: true});
+  } catch (err) {
+    return res.status(500).send(err);
+  }
 
-    return res.status(200).json({ joinCode: room.joinCode });
+  return res.status(200).json({joinCode: room.joinCode});
 });
 
 /*
@@ -113,21 +131,19 @@ router.post('/code/:roomId', authenticateUser, async (req, res) => {
     - Called by room owner
 */
 router.delete('/delete/:roomId', authenticateUser, async (req, res) => {
-    if (!req.body) return res.sendStatus(400);
+  const roomId = req.params.roomId;
+  const roomsOwned = res.locals.claims.roomsOwned;
 
-    const roomId = req.params.roomId;
-    const roomsOwned = res.locals.claims.roomsOwned;
+  // Check user claims before executing transaction
+  if (!roomsOwned || !roomsOwned.includes(roomId)) return res.sendStatus(403);
 
-    // Check user claims before executing transaction
-    if (!roomsOwned || !roomsOwned.includes(roomId)) return res.sendStatus(403);
+  try {
+    await Room.deleteOne({_id: roomId});
+  } catch (err) {
+    return res.sendStatus(404);
+  }
 
-    try {
-        await Room.deleteOne({ _id: roomId })
-    } catch (err) {
-        return res.sendStatus(404);
-    }
-
-    return res.sendStatus(204);
+  return res.sendStatus(204);
 });
 
 /*
@@ -136,30 +152,29 @@ router.delete('/delete/:roomId', authenticateUser, async (req, res) => {
     - Called by user
 */
 router.post('/leave/:roomId', authenticateUser, async (req, res) => {
-    if (!req.body) return res.sendStatus(400);
+  const roomId = req.params.roomId;
+  const claims = res.locals.claims;
+  const userId = claims.userId;
+  const roomsAdded = claims.roomsAdded;
 
-    const roomId = req.params.roomId;
-    const userId = req.body.userId;
-    const roomsAdded = res.locals.claims.roomsAdded;
+  // Check user claims before executing transaction
+  if (!roomsAdded || !roomsAdded.includes(roomId)) return res.sendStatus(403);
 
-    // Check user claims before executing transaction
-    if (!roomsAdded || !roomsAdded.includes(roomId)) return res.sendStatus(403);
+  const conditions = {
+    '_id': roomId,
+    'users.userId': userId,
+  };
 
-    const conditions = {
-        _id: roomId,
-        'users.userId': userId
-    };
+  const update = {$set: {'users.$.active': false}};
 
-    const update = { $set: { "users.$.active": false } };
+  let room;
+  try {
+    room = await Room.findOneAndUpdate(conditions, update, {new: true});
+  } catch (err) {
+    return res.status(500).send(err);
+  }
 
-    let room;
-    try {
-        room = await Room.findOneAndUpdate(conditions, update, {new: true});
-    } catch (err) {
-        return res.status(500).send(err);
-    }
-
-    return res.status(200).send(room);
+  return res.status(200).send(room);
 });
 
 /*
@@ -168,32 +183,29 @@ router.post('/leave/:roomId', authenticateUser, async (req, res) => {
     - Called by user
 */
 router.post('/join/:roomId', authenticateUser, async (req, res) => {
-    if (!req.body) return res.sendStatus(400);
+  const roomId = req.params.roomId;
+  const claims = res.locals.claims;
+  const userId = claims.userId;
+  const roomsAdded = claims.roomsAdded;
 
-    const roomId = req.params.roomId;
-    const userId = req.body.userId;
-    const roomsAdded = res.locals.claims.roomsAdded;
+  // Check user claims before executing transaction
+  if (!roomsAdded || !roomsAdded.includes(roomId)) return res.sendStatus(403);
 
-    // Check user claims before executing transaction
-    if (!roomsAdded || !roomsAdded.includes(roomId)) return res.sendStatus(403);
+  const conditions = {
+    '_id': roomId,
+    'users.userId': userId,
+  };
 
-    const conditions = {
-        _id: roomId,
-        'users.id': userId
-    };
+  const update = {$set: {'users.$.active': true}};
 
-    const update = {
-        $set: {"users.$.active": true}
-    };
+  let room;
+  try {
+    room = await Room.findOneAndUpdate(conditions, update, {new: true});
+  } catch (err) {
+    res.status(500).send(err);
+  }
 
-    let room;
-    try {
-        room = await Room.findOneAndUpdate(conditions, update, {new: true});
-    } catch (err) {
-        res.status(500).send(err);
-    }
-
-    return res.status(200).send(room);
+  return res.status(200).send(room);
 });
 
 /*
@@ -201,43 +213,44 @@ router.post('/join/:roomId', authenticateUser, async (req, res) => {
     - Called by user
 */
 router.post('/add/:roomId', authenticateUser, async (req, res) => {
-    if (!req.body) return res.sendStatus(400);
+  if (!req.body) return res.sendStatus(400);
 
-    const roomId = req.params.roomId;
-    const userId = req.body.userId;
-    const joinCode = req.body.joinCode;
+  const roomId = req.params.roomId;
+  const claims = res.locals.claims;
+  const userId = claims.userId;
+  const joinCode = req.body.joinCode;
 
-    const conditions = {
-        _id: roomId,
-        joinCode,
-        'users.id': {$ne: userId}
-    };
+  const conditions = {
+    '_id': roomId,
+    joinCode,
+    'users.userId': {$ne: userId},
+  };
 
-    const update = {
-        $addToSet: {users: {userId, active: false}}
-    };
+  const update = {
+    $addToSet: {users: {userId, active: false}},
+  };
 
-    let room;
-    try {
-        room = await Room.findOneAndUpdate(conditions, update, {new: true});
-    } catch (err) {
-        return res.status(500).send(err);
-    }
+  let room;
+  try {
+    room = await Room.findOneAndUpdate(conditions, update, {new: true});
+  } catch (err) {
+    return res.status(500).send(err);
+  }
 
-    // Removes roomsAdded claim from user
-    let user;
-    try {
-        user = await oktaClient.getUser(userId);
-    } catch (err) {
-        return res.status(500).send(err);
-    }
+  // Removes roomsAdded claim from user
+  let user;
+  try {
+    user = await oktaClient.getUser(userId);
+  } catch (err) {
+    return res.status(500).send(err);
+  }
 
-    if (!user.profile.roomsAdded) user.profile.roomsAdded = [];
+  if (!user.profile.roomsAdded) user.profile.roomsAdded = [];
 
-    user.profile.roomsAdded.push(roomId);
-    await user.update();
+  user.profile.roomsAdded.push(roomId);
+  await user.update();
 
-    return res.status(200).send(room);
+  return res.status(200).send(room);
 });
 
 /*
@@ -245,43 +258,42 @@ router.post('/add/:roomId', authenticateUser, async (req, res) => {
     - Called by room owner
 */
 router.post('/remove/:roomId', authenticateUser, async (req, res) => {
-    if (!req.body) return res.sendStatus(400);
+  const roomId = req.params.roomId;
+  const claims = res.locals.claims;
+  const userId = claims.userId;
+  const roomsOwned = claims.roomsOwned;
 
-    const roomId = req.params.roomId;
-    const userId = req.body.userId;
-    const roomsOwned = req.body.roomsOwned;
+  // Check user claims before executing transaction
+  if (!roomsOwned || !roomsOwned.includes(roomId)) return res.sendStatus(403);
 
-    // Check user claims before executing transaction
-    if (!roomsOwned || !roomsOwned.includes(roomId)) return res.sendStatus(403);
+  const conditions = {
+    '_id': roomId,
+    'users.userId': userId,
+  };
 
-    const conditions = {
-        _id: roomId,
-        'users.id': userId
-    };
+  const update = {
+    $pull: {users: {userId}},
+  };
 
-    const update = {
-        $pull: {users: { userId }}
-    };
+  let room;
+  try {
+    room = await Room.findOneAndUpdate(conditions, update, {new: true});
+  } catch (err) {
+    return res.status(500).send(err);
+  }
 
-    let room;
-    try {
-        room = await Room.findOneAndUpdate(conditions, update, {new: true});
-    } catch (err) {
-        return res.status(500).send(err);
-    }
+  // Removes roomsAdded claim from user
+  let user;
+  try {
+    user = await oktaClient.getUser(userId);
+  } catch (err) {
+    return res.status(500).send(err);
+  }
 
-    // Removes roomsAdded claim from user
-    let user;
-    try {
-        user = await oktaClient.getUser(userId);
-    } catch (err) {
-        return res.status(500).send(err);
-    }
+  delete user.profile.roomsAdded[roomId];
+  await user.update();
 
-    delete user.profile.roomsAdded[roomId];
-    await user.update();
-
-    return res.status(200).send(room);
+  return res.status(200).send(room);
 });
 
 module.exports = router;

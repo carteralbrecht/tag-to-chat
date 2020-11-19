@@ -8,7 +8,11 @@ const authenticateUser = require('../authMiddleware');
 // TODO: Everything shouldn't be a post
 // TODO: Better Responses
 // TODO: Edge Cases and Error Handling
-// create a room
+
+/*
+    - Creates a room
+    - Called by user
+*/
 router.post('/create', authenticateUser, async (req, res) => {
     if (!req.body) return res.sendStatus(400);
 
@@ -49,25 +53,64 @@ router.post('/create', authenticateUser, async (req, res) => {
     const roomId = data._id;
 
     // Adds authentication claims to user
-    if (!user.profile.roomsOwned) {
-        user.profile.roomsOwned = [];
-    }
-
-    if (!user.profile.roomsAdded) {
-        user.profile.roomsAdded = [];
-    }
+    if (!user.profile.roomsOwned) user.profile.roomsOwned = [];
+    if (!user.profile.roomsAdded) user.profile.roomsAdded = [];
 
     user.profile.roomsOwned.push(roomId);
     user.profile.roomsAdded.push(roomId);
-
-    console.log(user.profile);
 
     await user.update();
 
     return res.status(200).send(data);
 });
 
-// delete room
+/*
+    - Gets room join code
+    - Called by room owner
+*/
+router.get('/code/:roomId', authenticateUser, async (req, res) => {
+    const roomId = req.params.roomId;
+    const roomsOwned = res.locals.claims.roomsOwned;
+
+    // Check user claims before executing transaction
+    if (!roomsOwned || !roomsOwned.includes(roomId)) return res.sendStatus(403);
+    let room;
+    try {
+        room = await Room.findById(roomId);
+    } catch (err) {
+        return res.setStatus(500).send(err);
+    }
+
+    return res.status(200).json({ joinCode: room.joinCode });
+});
+
+/*
+    - Resets room join code and returns it
+    - Called by room owner
+*/
+router.post('/code/:roomId', authenticateUser, async (req, res) => {
+    const roomsOwned = res.locals.claims.roomsOwned;
+
+    // Check user claims before executing transaction
+    if (!roomsOwned || !roomsOwned.includes(roomId)) return res.sendStatus(403);
+
+    const conditions = { _id: roomId };
+    const update = { $set: { "joinCode": uuidv4() } };
+
+    let room;
+    try {
+        room = await Room.findOneAndUpdate(conditions, update, {new: true});
+    } catch (err) {
+        return res.status(500).send(err);
+    }
+
+    return res.status(200).json({ joinCode: room.joinCode });
+});
+
+/*
+    - Delete room
+    - Called by room owner
+*/
 router.delete('/delete/:roomId', authenticateUser, async (req, res) => {
     if (!req.body) return res.sendStatus(400);
 
@@ -86,8 +129,11 @@ router.delete('/delete/:roomId', authenticateUser, async (req, res) => {
     return res.sendStatus(204);
 });
 
-// leave a user from room
-// (mark as not active)
+/*
+    - Leaves a user from room
+    - Sets active field to false
+    - Called by user
+*/
 router.post('/leave/:roomId', authenticateUser, async (req, res) => {
     if (!req.body) return res.sendStatus(400);
 
@@ -115,8 +161,11 @@ router.post('/leave/:roomId', authenticateUser, async (req, res) => {
     return res.status(200).send(room);
 });
 
-// join a user to room
-// (mark as active)
+/*
+    - Joins a user to room
+    - Sets active field to true
+    - Called by user
+*/
 router.post('/join/:roomId', authenticateUser, async (req, res) => {
     if (!req.body) return res.sendStatus(400);
 
@@ -146,7 +195,10 @@ router.post('/join/:roomId', authenticateUser, async (req, res) => {
     return res.status(200).send(room);
 });
 
-// add user to room
+/*
+    - Adds user to room
+    - Called by user
+*/
 router.post('/add/:roomId', authenticateUser, async (req, res) => {
     if (!req.body) return res.sendStatus(400);
 
@@ -171,18 +223,35 @@ router.post('/add/:roomId', authenticateUser, async (req, res) => {
         return res.status(500).send(err);
     }
 
+    // Removes roomsAdded claim from user
+    let user;
+    try {
+        user = await oktaClient.getUser(userId);
+    } catch (err) {
+        return res.status(500).send(err);
+    }
+
+    if (!user.profile.roomsAdded) user.profile.roomsAdded = [];
+
+    user.profile.roomsAdded.push(roomId);
+    await user.update();
+
     return res.status(200).send(room);
 });
 
-// remove user from room
-router.delete('/remove/:roomId', authenticateUser, async (req, res) => {
+/*
+    - Removes user from room
+    - Called by room owner
+*/
+router.post('/remove/:roomId', authenticateUser, async (req, res) => {
     if (!req.body) return res.sendStatus(400);
 
     const roomId = req.params.roomId;
     const userId = req.body.userId;
+    const roomsOwned = req.body.roomsOwned;
 
     // Check user claims before executing transaction
-    if (!res.locals.claims.roomsOwned.includes(roomId)) return res.sendStatus(403);
+    if (!roomsOwned || !roomsOwned.includes(roomId)) return res.sendStatus(403);
 
     const conditions = {
         _id: roomId,
@@ -199,6 +268,17 @@ router.delete('/remove/:roomId', authenticateUser, async (req, res) => {
     } catch (err) {
         return res.status(500).send(err);
     }
+
+    // Removes roomsAdded claim from user
+    let user;
+    try {
+        user = await oktaClient.getUser(userId);
+    } catch (err) {
+        return res.status(500).send(err);
+    }
+
+    delete user.profile.roomsAdded[roomId];
+    await user.update();
 
     return res.status(200).send(room);
 });

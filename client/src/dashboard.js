@@ -19,7 +19,7 @@ import Slide from "@material-ui/core/Slide";
 import CloseIcon from "@material-ui/icons/Close";
 import IconButton from "@material-ui/core/IconButton";
 import FaceIcon from "@material-ui/icons/Face";
-import SearchIcon from '@material-ui/icons/Search';
+import SearchIcon from "@material-ui/icons/Search";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -60,18 +60,28 @@ const useStyles = makeStyles((theme) => ({
   searchButton: {
     // Styles for the search button that will redirect to explore page
     color: "white",
-    marginTop: theme.spacing(-12),
+    marginTop: theme.spacing(-12)
   },
   logOutButton: {
     // Styles for logout button
-    color: 'whitesmoke',
+    color: "whitesmoke",
     marginTop: theme.spacing(-12),
     fontSize: 30,
-    backgroundColor: 'grey',
+    backgroundColor: "grey",
     marginLeft: theme.spacing(190),
-    alignSelf: 'right',
+    alignSelf: "right",
     flex: 1,
-    justifyContent: 'right'
+    justifyContent: "right"
+  },
+  profileModal: {
+    position: "absolute",
+    width: 400,
+    backgroundColor: "grey",
+    border: "2px",
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing(2, 4, 3),
+    margin: 'auto',
+    marginTop: theme.spacing(-20)
   }
 }));
 
@@ -84,10 +94,21 @@ const pageTheme = createMuiTheme({
   }
 });
 
-// Set slide transition for message window to come down from top of screen
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="down" ref={ref} {...props} />;
 });
+
+// function that returns style of modal
+function getModalStyle() {
+  const top = 50;
+  const left = 50;
+
+  return {
+    top: `${top}%`,
+    left: `${left}%`,
+    transform: `translate(-${top}%, -${left}%)`
+  };
+}
 
 function Dashboard() {
   // Attributing styles to their classes definted up top
@@ -98,6 +119,7 @@ function Dashboard() {
 
   // state variable for opening profile modal
   const [openProfileWindow, setOpenProfile] = React.useState(false);
+  const [modalStyle] = React.useState(getModalStyle);
 
   // Functions for opening and closing a chat window
   const openChat = () => {
@@ -117,6 +139,16 @@ function Dashboard() {
     setOpenProfile(false);
   };
 
+  // styling for the body of the profile modal
+  const profileBody = (
+    <div style={modalStyle} className={classes.profileModal}>
+      <FaceIcon style={{fontSize: 40}} />
+      <h1 id="nickname">Nickname</h1>
+      <h1 id="email">Email </h1>
+      <h1 id="password" type="password"> Password </h1>
+    </div>
+  );
+
   // Render the dashboard page
   return (
     <MuiThemeProvider theme={pageTheme}>
@@ -131,17 +163,31 @@ function Dashboard() {
         Dashboard
       </Typography>
 
-      <IconButton className={classes.profileButton} edge="right" display="inline">
+      <IconButton
+        className={classes.profileButton}
+        edge="right"
+        display="inline"
+        onClick={openProfile}
+      >
         <FaceIcon display="inline" style={{ fontSize: 50 }} />
       </IconButton>
+      <Modal
+        open={openProfileWindow}
+        onClose={closeProfile}
+        label="profileModal"
+      >
+        {profileBody}
+      </Modal>
 
-      <IconButton className={classes.searchButton} edge="right" display="inline">
-        <SearchIcon display="inline" style={{fontSize: 50}} />
+      <IconButton
+        className={classes.searchButton}
+        edge="right"
+        display="inline"
+      >
+        <SearchIcon display="inline" style={{ fontSize: 50 }} />
       </IconButton>
 
-      <Button className={classes.logOutButton}>
-        Log Out
-      </Button>
+      <Button className={classes.logOutButton}>Log Out</Button>
 
       <Card
         variant="outlined"

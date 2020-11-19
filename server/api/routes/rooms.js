@@ -89,6 +89,7 @@ router.get('/code/:roomId', authenticateUser, async (req, res) => {
     - Called by room owner
 */
 router.post('/code/:roomId', authenticateUser, async (req, res) => {
+    const roomId = req.params.roomId;
     const roomsOwned = res.locals.claims.roomsOwned;
 
     // Check user claims before executing transaction

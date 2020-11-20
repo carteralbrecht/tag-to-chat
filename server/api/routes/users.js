@@ -65,9 +65,9 @@ router.put('/create', async (req, res) => {
     },
     credentials: {
       password: {
-        value: req.body.password
-      }
-    }
+        value: req.body.password,
+      },
+    },
   };
   let user;
   try {

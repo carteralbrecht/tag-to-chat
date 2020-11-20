@@ -6,24 +6,23 @@ const got = require('got');
 router.post('/login', async (req, res) => {
   if (!req.body) return res.sendStatus(400);
 
-  let response;
   try {
-    response = await got.post('https://dev-1701617.okta.com/api/v1/authn', {
+    await got.post('https://dev-1701617.okta.com/api/v1/authn', {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': `SSWS ${process.env.OKTA_TOKEN}`
+        'Authorization': `SSWS ${process.env.OKTA_TOKEN}`,
       },
       body: JSON.stringify({
         username: req.body.username,
-        password: req.body.password
-      })
+        password: req.body.password,
+      }),
     }).json();
   } catch (err) {
     return res.status(500).send(err);
   }
 
-  return res.status(200).send({ sessionToken: response.sessionToken});
+  return res.status(200).send({sessionToken: response.sessionToken});
 });
 
 router.post('/forgot', async (req, res) => {
@@ -39,14 +38,13 @@ router.post('/forgot', async (req, res) => {
   }
 
   // Send recovery email
-  let response;
   try {
-    response = await got.post(user._links.forgotPassword.href, {
+    await got.post(user._links.forgotPassword.href, {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': `SSWS ${process.env.OKTA_TOKEN}`
-      }
+        'Authorization': `SSWS ${process.env.OKTA_TOKEN}`,
+      },
     }).json();
   } catch (err) {
     return res.status(500).send(err);

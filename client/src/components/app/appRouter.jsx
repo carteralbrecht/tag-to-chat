@@ -7,7 +7,7 @@ import SignIn from '../signin/signin';
 import Chat from '../chat/chat';
 import Navbar from '../navbar/navbar';
 import Register from '../register/register';
-import Dashboard fro '../dashboard/dashboard';
+import Dashboard from '../dashboard/dashboard';
 
 class AppRouter extends Component {
   constructor(props) {

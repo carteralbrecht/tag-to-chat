@@ -7,6 +7,7 @@ import SignIn from './SignIn';
 import Chat from './Chat';
 import Navbar from './Navbar';
 import Register from './Register';
+import Dashboard from './dashboard';
 
 class AppRouter extends Component {
   constructor(props) {
@@ -31,6 +32,7 @@ class AppRouter extends Component {
             <Route path='/login' render={() => <SignIn issuer='https://dev-1701617.okta.com/oauth2/default' />} />
             <Route path='/register' render={() => <Register issuer='https://dev-1701617.okta.com/oauth2/default' />} />
             <SecureRoute path="/chat" component={Chat} />
+            <SecureRoute path="/dashboard" component={Dashboard} />
         </Security>
     );
   }

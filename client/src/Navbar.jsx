@@ -38,6 +38,7 @@ const Navbar = () => {
                   </Link>
                 </Typography>
                 {authState.isAuthenticated && <Button color="inherit" id="chat-button" as="a" href="/chat">Chat</Button>}
+                {authState.isAuthenticated && <Button color="inherit" id="dashboard-button" as="a" href="/dashboard">Dashboard</Button>}
                 {authState.isAuthenticated && <Button color="inherit" id="logout-button" as="a" onClick={logout}>Logout</Button>}
                 {!authState.isPending && !authState.isAuthenticated && <Button color="inherit" as="a" onClick={login}>Login</Button>}
                 {!authState.isPending && !authState.isAuthenticated && <Button color="inherit" as="a" onClick={register}>Register</Button>}

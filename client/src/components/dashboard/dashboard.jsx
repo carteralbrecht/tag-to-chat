@@ -96,6 +96,7 @@ class Dashboard extends Component {
     this.state = {
       chat: [],
       content: '',
+      searchQuery: '',
       rooms: [],
       userInfo: {},
       chatOpen: false,
@@ -247,6 +248,13 @@ class Dashboard extends Component {
     });
   }
 
+  // Save the query the user is typing in the search input field
+  handleSearchInput(event) {
+    this.setState({
+      searchInput: event.target.value,
+    });
+  }
+
   async handleSubmit(event) {
     // Prevent the form to reload the current page.
     event.preventDefault();
@@ -263,6 +271,32 @@ class Dashboard extends Component {
     this.setState({content: ''});
   }
 
+  async handleSearchSubmit() {
+    const accessToken = await this.props.authService.getAccessToken();
+    const tags = [];
+    const tagLookingFor = this.state.searchInput;
+
+    //https://stackoverflow.com/questions/44374267/mongoose-return-document-if-a-search-string-is-in-an-array
+    tags.push(tagLookingFor);
+
+    const response = await fetch(`/api/rooms/tags`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      },
+      body: JSON.stringify({
+        tags: tags
+      })
+    });
+
+    const rooms = await response.json();
+    console.log(rooms);
+
+    this.setState({ searchInput: ''});
+  }
+
   handleProfileOpen = () => this.setState({ profileOpen: true, profileError: '' });
   handleProfileClose = () => this.setState({ profileOpen: false });
 
@@ -271,6 +305,8 @@ class Dashboard extends Component {
 
   handleSearchOpen = () => this.setState({ searchOpen: true });
   handleSearchClose = () => this.setState({ searchOpen: false });
+
+
 
   handleChange(e) {
     const userInfo = this.state.userInfo;
@@ -444,7 +480,7 @@ class Dashboard extends Component {
               id="query"
               label="Search Query"
               type="text"
-              onChange={this.handleQueryChange}
+              onChange={this.handleSearchInput.bind(this)}
               fullWidth
             />
           </DialogContent>
@@ -452,7 +488,7 @@ class Dashboard extends Component {
             <Button onClick={this.handleSearchClose} color="secondary">
               Cancel
             </Button>
-            <Button onClick={this.handleSearch} color="primary">
+            <Button onClick={this.handleSearchSubmit.bind(this)} color="primary">
               Search
             </Button>
           </DialogActions>

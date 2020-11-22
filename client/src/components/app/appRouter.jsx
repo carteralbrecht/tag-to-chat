@@ -4,7 +4,6 @@ import { Route, withRouter } from 'react-router-dom';
 import { Security, SecureRoute, LoginCallback } from '@okta/okta-react';
 import Home from '../home/home';
 import SignIn from '../signin/signin';
-import Chat from '../chat/chat';
 import Navbar from '../navbar/navbar';
 import Register from '../register/register';
 import Dashboard from '../dashboard/dashboard';
@@ -31,7 +30,6 @@ class AppRouter extends Component {
             <Route path="/login/callback" component={LoginCallback} />
             <Route path='/login' render={() => <SignIn issuer='https://dev-1701617.okta.com/oauth2/default' />} />
             <Route path='/register' render={() => <Register issuer='https://dev-1701617.okta.com/oauth2/default' />} />
-            <SecureRoute path="/chat" component={Chat} />
             <SecureRoute path="/dashboard" component={Dashboard} />
         </Security>
     );

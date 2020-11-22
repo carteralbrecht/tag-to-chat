@@ -5,12 +5,8 @@ const {v4: uuidv4} = require('uuid');
 const oktaClient = require('../lib/oktaClient');
 const authenticateUser = require('../authMiddleware');
 
-// TODO: Everything shouldn't be a post
-// TODO: Better Responses
-// TODO: Edge Cases and Error Handling
-
 /*
-    - Gets all rooms
+    - Gets all rooms a user is added to
     - Pulls from user authenticaion claims
 */
 router.get('/', authenticateUser, async (req, res) => {
@@ -28,6 +24,27 @@ router.get('/', authenticateUser, async (req, res) => {
 });
 
 /*
+    - returns all rooms with queried tags
+    https://stackoverflow.com/questions/44374267/mongoose-return-document-if-a-search-string-is-in-an-array
+*/
+router.post('/tags', authenticateUser, async (req, res) => {
+  if (!req.body) {
+    return res.sendStatus(400);
+  }
+
+  const tagsLookingFor = arrayToLower(req.body.tags);
+  const conditions = {tags: {$in: tagsLookingFor}};
+
+  Room.find(conditions).exec((err, rooms) => {
+    if (err) {
+      return res.status(500).send(err);
+    } else {
+      return res.status(200).send(rooms);
+    }
+  });
+});
+
+/*
     - Creates a room
     - Called by user
 */
@@ -37,6 +54,7 @@ router.post('/create', authenticateUser, async (req, res) => {
   const name = req.body.name;
   const email = req.body.email;
   const private = req.body.private;
+  const tags = req.body.tags;
 
   let user;
   try {
@@ -54,6 +72,7 @@ router.post('/create', authenticateUser, async (req, res) => {
     joinCode: uuidv4(),
     users: [],
     messages: [],
+    tags: arrayToLower(tags),
   });
 
   roomToCreate.users.push({
@@ -295,5 +314,13 @@ router.post('/remove/:roomId', authenticateUser, async (req, res) => {
 
   return res.status(200).send(room);
 });
+
+arrayToLower = (array) => {
+  const arrayLower = [];
+  for (let i = 0; i < array.length; i++) {
+    arrayLower.push(array[i].toLowerCase());
+  }
+  return arrayLower;
+};
 
 module.exports = router;

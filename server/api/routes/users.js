@@ -2,12 +2,41 @@ const express = require('express');
 const router = express.Router();
 const oktaClient = require('../lib/oktaClient');
 const got = require('got');
+const authenticateUser = require('../authMiddleware');
+
+router.post('/updateProfile', authenticateUser, async (req, res) => {
+  if (!req.body) return res.sendStatus(400);
+
+  const userInfo = req.body.userInfo;
+  const claims = res.locals.claims;
+  const userId = claims.userId;
+
+  let user;
+  try {
+    user = await oktaClient.getUser(userId);
+  } catch (err) {
+    return res.status(500).send(err);
+  }
+
+  user.profile.nickName = userInfo.nickName;
+  user.profile.firstName = userInfo.firstName;
+  user.profile.lastName = userInfo.lastName;
+
+  try {
+    await user.update();
+  } catch (err) {
+    return res.status(500).send(err);
+  }
+
+  return res.sendStatus(204);
+});
 
 router.post('/login', async (req, res) => {
   if (!req.body) return res.sendStatus(400);
 
+  let response;
   try {
-    await got.post('https://dev-1701617.okta.com/api/v1/authn', {
+    response = await got.post('https://dev-1701617.okta.com/api/v1/authn', {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',

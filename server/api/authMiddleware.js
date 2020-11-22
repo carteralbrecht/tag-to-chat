@@ -1,28 +1,19 @@
-const OktaJwtVerifier = require('@okta/jwt-verifier');
-
-const oktaJwtVerifier = new OktaJwtVerifier({
-  issuer: 'https://dev-1701617.okta.com/oauth2/default',
-});
+const validateToken = require('./lib/validateToken');
 
 const authenticateUser = async (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader) return res.sendStatus(403);
 
-  const token = authHeader.split(' ')[1];
+  const accessToken = authHeader.split(' ')[1];
 
-  let jwt;
-  try {
-    jwt = await oktaJwtVerifier.verifyAccessToken(token, 'api://default');
-  } catch (err) {
-    console.log(err);
+  const response = await validateToken(accessToken);
+
+  if (response.err) {
+    console.log(response.err);
     return res.sendStatus(403);
   }
 
-  res.locals.claims = {
-    userId: jwt.claims.uid,
-    roomsAdded: jwt.claims.roomsAdded,
-    roomsOwned: jwt.claims.roomsOwned,
-  };
+  res.locals.claims = response.claims;
 
   return next();
 };

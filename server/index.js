@@ -4,11 +4,13 @@ const http = require('http').Server(app);
 const path = require('path');
 const io = require('socket.io')(http);
 
+const validateToken = require('./api/lib/validateToken');
+
 const uri = process.env.MONGODB_URI;
 const port = process.env.PORT || 5000;
 
-const Message = require('./models/Message');
 const mongoose = require('mongoose');
+const Room = require('./models/Room');
 
 const usersRouter = require('./api/routes/users');
 const roomsRouter = require('./api/routes/rooms');
@@ -25,40 +27,74 @@ app.use('/api/users', usersRouter);
 app.use('/api/rooms', roomsRouter);
 
 io.on('connection', (socket) => {
-  socket.on('joinRoom', (room) => {
-    socket.join(room);
+  socket.on('joinRoom', async (accessToken) => {
+    const {claims} = await validateToken(accessToken);
+    const {roomActive, nickName, email} = claims;
 
-    // Get the last 10 messages from the database.
-    Message
-        .find({room: room})
-        .sort({createdAt: -1})
-        .limit(10)
-        .exec((err, messages) => {
-          if (err) return console.error(err);
+    socket.join(roomActive);
+    io.to(roomActive).emit('push',
+        `${nickName ? nickName : email} has joined the room`,
+    );
+  });
 
-          // Send the last messages to the user.
-          socket.emit('init', messages);
-        });
+  socket.on('leaveRoom', async (accessToken) => {
+    const {claims} = await validateToken(accessToken);
+    const {roomActive, nickName, email} = claims;
+
+    socket.leave(roomActive);
+    io.to(roomActive).emit('push',
+        `${nickName ? nickName : email} has left the room`,
+    );
   });
 
 
   // Listen to connected users for a new message.
-  socket.on('message', (msg) => {
-    // Create a message with the content and the name of the user.
-    const message = new Message({
-      content: msg.content,
-      name: msg.name,
-      room: msg.room,
-    });
+  socket.on('message', async (msg) => {
+    const {accessToken, content} = msg;
+    const {claims} = await validateToken(accessToken);
+    const {roomActive, nickName, email} = claims;
 
-    // Save the message to the database.
-    message.save((err) => {
-      if (err) return console.error(err);
-    });
+    const conditions = {'_id': roomActive};
 
-    // push to all in the room except self
-    // https://stackoverflow.com/questions/10058226/send-response-to-all-clients-except-sender
-    socket.broadcast.in(msg.room).emit('push', msg);
+    // TODO: XSS protection
+
+    const newMessage = {
+      name: nickName ? nickName : email,
+      content,
+    };
+
+    const update = {
+      $addToSet: {
+        messages: newMessage,
+      },
+    };
+
+    /*
+      TODO: 
+        1. Pull max of 'x' messages
+        2. Remove join code from resposne
+    */
+
+    let room;
+    try {
+      room = await Room.findOneAndUpdate(conditions, update, {new: true});
+    } catch (err) {
+      console.log(err);
+      return socket.emit('messageError', {err});
+    }
+
+    if (!room) return socket.emit('messageError', 'Unknown error');
+
+    /*
+      Adding message in client can cause a problem
+      where the message send fails on server and
+      client adds message anyway.
+
+      Instead of sending a message send confirmation
+      to the client, the client just recieves the
+      message with everyone else in room.
+    */
+    io.to(roomActive).emit('push', newMessage);
   });
 });
 

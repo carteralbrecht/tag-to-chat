@@ -4,7 +4,7 @@ import io from 'socket.io-client';
 
 import { withOktaAuth } from '@okta/okta-react';
 
-import { Container, Grid, Paper, Typography, Button} from '@material-ui/core';
+import {Grid, Paper, Typography, Button} from '@material-ui/core';
 
 import BottomBar from './bottomBar';
 import './chat.css';

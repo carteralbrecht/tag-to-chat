@@ -69,6 +69,12 @@ io.on('connection', (socket) => {
       },
     };
 
+    /*
+      TODO: 
+        1. Pull max of 'x' messages
+        2. Remove join code from resposne
+    */
+
     let room;
     try {
       room = await Room.findOneAndUpdate(conditions, update, {new: true});
@@ -77,9 +83,18 @@ io.on('connection', (socket) => {
       return socket.emit('messageError', {err});
     }
 
-    // push to all in the room except self
-    // https://stackoverflow.com/questions/10058226/send-response-to-all-clients-except-sender
-    socket.broadcast.in(roomActive).emit('push', msg);
+    if (!room) return socket.emit('messageError', 'Unknown error');
+
+    /*
+      Adding message in client can cause a problem
+      where the message send fails on server and
+      client adds message anyway.
+
+      Instead of sending a message send confirmation
+      to the client, the client just recieves the
+      message with everyone else in room.
+    */
+    io.to(roomActive).emit('push', newMessage);
   });
 });
 

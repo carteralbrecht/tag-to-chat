@@ -185,6 +185,9 @@ class Dashboard extends Component {
         chat: [...state.chat, msg],
       }), this.scrollToBottom);
     });
+
+    // Automatically join first room user is added to
+    if (this.state.rooms.length > 0) this.handleJoinRoom(this.state.rooms[0]._id);
   }
 
   async handleLeaveRoom(roomId) {
@@ -202,7 +205,7 @@ class Dashboard extends Component {
 
     this.socket.emit('leaveRoom', accessToken);
 
-    this.setState({ activeRoom: roomId });
+    this.setState({ activeRoom: '', chat: []});
 
     console.log('Join room successful');
   }
@@ -231,7 +234,7 @@ class Dashboard extends Component {
 
     console.log('Join room successful');
 
-    const messages = room.messages.reverse();
+    const messages = room.messages;
     this.setState((state) => ({
       chat: [...state.chat, ...messages],
     }), this.scrollToBottom);
@@ -249,7 +252,6 @@ class Dashboard extends Component {
     event.preventDefault();
 
     const accessToken = await this.props.authService.getAccessToken();
-    const userInfo = this.state.userInfo;
     const content = this.state.content;
 
     // Send the new message to the server.
@@ -258,16 +260,7 @@ class Dashboard extends Component {
       content
     });
 
-    this.setState((state) => {
-      // Update the chat with the user's message and remove the current message.
-      return {
-        chat: [...state.chat, {
-          name: state.nickname,
-          content: state.content,
-        }],
-        content: '',
-      };
-    }, this.scrollToBottom);
+    this.setState({content: ''});
   }
 
   handleProfileOpen = () => this.setState({ profileOpen: true, profileError: '' });

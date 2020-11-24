@@ -11,6 +11,7 @@ const roomSchema = new mongoose.Schema({
     active: Boolean,
   }],
   messages: [messageSchema],
+  tags: [String],
 }, {
   timestamps: true,
 });

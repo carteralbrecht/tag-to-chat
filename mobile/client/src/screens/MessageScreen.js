@@ -23,9 +23,6 @@ class MessageScreen extends React.Component {
   render() {
     return (
       <SafeAreaView style={styles.background}>
-        <View style={styles.topBar}>
-          <Text style={styles.topText}>Chat</Text>
-        </View>
         <FlatList
           style={styles.messageBlock}
           data={this.state.chat}
@@ -41,20 +38,6 @@ class MessageScreen extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  topBar: {
-    backgroundColor: "#5102A1",
-    flexDirection: "row",
-    flex: 0.1,
-    justifyContent: "flex-start",
-    alignItems: "center",
-  },
-
-  topText: {
-    color: "white",
-    fontSize: 25,
-    marginLeft: 10,
-  },
-
   messageBlock: {
     marginTop: 20,
     marginLeft: 20,

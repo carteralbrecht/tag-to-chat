@@ -10,10 +10,25 @@ const Stack = createStackNavigator();
 
 export const AppNavigator = () => (
   <NavigationContainer>
-    <Stack.Navigator headerMode="none" initialRouteName="Login">
-      <Stack.Screen name="Login" component={Login} />
-      <Stack.Screen name="Register" component={Register} />
-      <Stack.Screen name="Chat" component={Chat} />
+    <Stack.Navigator
+      initialRouteName="Login"
+      screenOptions={{
+        headerStyle: { backgroundColor: "#5102A1" },
+        headerTintColor: "white",
+        headerTitleStyle: { fontSize: 25 },
+      }}
+    >
+      <Stack.Screen
+        name="Login"
+        component={Login}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Register"
+        component={Register}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen name="Chat" component={Chat} options={{ title: "Chat" }} />
     </Stack.Navigator>
   </NavigationContainer>
 );

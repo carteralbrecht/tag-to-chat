@@ -5,6 +5,7 @@ import {
   KeyboardAvoidingView,
   TextInput,
   Button,
+  SafeAreaView,
 } from "react-native";
 
 function AddMessage({ submitHandler }) {
@@ -15,7 +16,10 @@ function AddMessage({ submitHandler }) {
   };
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS == "android" ? "" : "padding"}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS == "android" ? "height" : "padding"}
+      keyboardVerticalOffset={85}
+    >
       <View style={styles.inputBckrnd}>
         <View style={styles.inputView}>
           <TextInput

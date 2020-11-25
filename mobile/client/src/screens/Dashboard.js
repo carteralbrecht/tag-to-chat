@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Header from "../components/Header";
 import Header2 from "../components/Header2";
 
@@ -12,11 +12,13 @@ import {
   View,
   Button,
   Alert,
+  Modal,
+  TouchableHighlight
 } from "react-native";
-import { Card, ListItem, Icon } from "react-native-elements"
-
+import { Card, ListItem, Icon } from "react-native-elements";
 
 class Dashboard extends React.Component {
+
   state = {
     email: "",
     password: "",
@@ -28,32 +30,33 @@ class Dashboard extends React.Component {
 
   render() {
     const statusbar = (Platform.OS == 'ios') ? <View style={styles.statusbar}></View> : <View></View>;
-
     return (
       <View style={ styles.container }>
         {statusbar}
         <View style={styles.fixToText}>
           <Icon
-            name='person'
+            name='face'
             size='30'
-            color="#fff"
+            color="#fff" 
             title="Profile"
-            onPress={() => Alert.alert('Profile button pressed')}
+            onPress={() => Alert.alert('Navigate to UpdateUser.js') }
           />
           <Icon
             name='search'
             size='30'
             color='#fff'
             title="Search"
-            onPress={() => Alert.alert('Search button pressed')}
+            onPress={() => Alert.alert('Navigate to SearchChat.js')}
           />
           <Header title="Dashboard"/>
           <Button
             title="Log Out"
             color="#fff"
-            onPress={() => Alert.alert('Log out button pressed')}
+            onPress={() => Alert.alert('Navigate to LoginScreen.js')}
           />
         </View>
+
+
         <Header2 title="Chat List:"/>
         <ScrollView style={ styles.cardContainer }>
           <Card containerStyle={{ borderRadius: 10 }}>
@@ -113,18 +116,6 @@ class Dashboard extends React.Component {
             <Button
               title='Open'
               onPress={() => Alert.alert('Chat 5 button pressed')}
-              color="#5102A1"
-            />
-          </Card> 
-          <Card containerStyle={{ borderRadius: 10 }}>
-            <Card.Title>Chat 6</Card.Title>
-            <Text style={{marginBottom: 10}}>
-              Description for Chat 6
-            </Text>
-            <Card.Divider/>
-            <Button
-              title='Open'
-              onPress={() => Alert.alert('Chat 6 button pressed')}
               color="#5102A1"
             />
           </Card> 

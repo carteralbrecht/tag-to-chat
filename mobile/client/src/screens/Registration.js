@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     },
     registerBtn: {
         width: "80%",
-        backgroundColor: "#29a329",
+        backgroundColor: "#5102A1",
         borderRadius: 25,
         height: 50,
         justifyContent: "center",

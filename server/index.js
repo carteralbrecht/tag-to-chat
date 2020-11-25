@@ -14,6 +14,7 @@ const Room = require('./models/Room');
 
 const usersRouter = require('./api/routes/users');
 const roomsRouter = require('./api/routes/rooms');
+const authRouter = require('./api/routes/auth');
 
 mongoose.connect(uri, {
   useUnifiedTopology: true,
@@ -25,6 +26,7 @@ app.use(express.static(path.join(__dirname, '..', 'client', 'build')));
 
 app.use('/api/users', usersRouter);
 app.use('/api/rooms', roomsRouter);
+app.use('/api/auth', authRouter);
 
 io.on('connection', (socket) => {
   socket.on('joinRoom', async (accessToken) => {

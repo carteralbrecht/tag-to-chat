@@ -20,6 +20,10 @@ class MessageScreen extends React.Component {
     });
   };
 
+  async componentDidMount() {
+    console.log(this.props.route.params);
+  }
+
   render() {
     return (
       <SafeAreaView style={styles.background}>

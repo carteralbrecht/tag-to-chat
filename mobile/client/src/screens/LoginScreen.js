@@ -7,22 +7,45 @@ import {
   View,
 } from "react-native";
 
-class LoginScreen extends React.Component {
-  state = {
-    nickname: "",
-    password: "",
-  };
+import OktaClient from '../oktaClient.js';
 
-  login() {
-    if (this.state.nickname == "") {
-      alert("Please enter your username");
+class LoginScreen extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      email: "",
+      username: "",
+      password: ""
+    };
+
+    this.oktaClient = new OktaClient('192.168.86.31:5000');
+  }
+
+  async login() {
+    if (this.state.username == "") {
+      return alert("Please enter your email");
     }
 
     if (this.state.password == "") {
-      alert("Please enter your password");
-    } else {
-      this.props.navigation.navigate("Chat", this.state.nickname);
+      return alert("Please enter your password");
     }
+
+    let response = await this.oktaClient.signIn(this.state);
+    if (response.err) {
+      return console.log('Error signing in user: ', response.err);
+    }
+
+    const sessionToken = response.sessionToken;
+
+    response = await this.oktaClient.getAccessToken(sessionToken);
+    if (response.err) {
+      return console.log('Error getting access token: ', response.err);
+    }
+
+    const accessToken = response.accessToken;
+    this.setState({ accessToken });
+
+    this.props.navigation.navigate("Chat", this.state);
   }
 
   render() {
@@ -32,9 +55,9 @@ class LoginScreen extends React.Component {
         <View style={styles.inputView}>
           <TextInput
             style={styles.inputText}
-            placeholder="Username..."
+            placeholder="Email..."
             placeholderTextColor="white"
-            onChangeText={(text) => this.setState({ nickname: text })}
+            onChangeText={(text) => this.setState({ email: text })}
           />
         </View>
         <View style={styles.inputView}>

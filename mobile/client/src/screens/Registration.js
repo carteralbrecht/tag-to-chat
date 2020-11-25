@@ -7,25 +7,41 @@ import {
   View,
 } from "react-native";
 
+import OktaClient from '../oktaClient.js';
+
 class Reg extends React.Component {
   constructor() {
     super();
     this.state = {
-      nickname: "",
+      nickName: "",
       email: "",
       password: "",
       confirmPassword: "",
     };
 
+    this.oktaClient = new OktaClient('192.168.86.31:5000');
+
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  handleSubmit(event) {
+  async handleSubmit(event) {
     event.preventDefault();
 
-    if (this.validate()) {
-      this.props.navigation.navigate("Login");
+    if (!this.validate()) {
+      // Show errors on form
+      return;
     }
+
+    let response = await this.oktaClient.register(this.state);
+    if (response.err) {
+      return console.log(response.err);
+    }
+
+    if (!response.user) {
+      return console.log('Unknown error');
+    }
+
+    this.props.navigation.navigate("Login");
   }
 
   validate() {
@@ -33,12 +49,12 @@ class Reg extends React.Component {
 
     if (this.state.nickname == "") {
       isValid = false;
-      alert("Please enter a username.");
+      alert("Please enter a nickname.");
     }
 
     if (this.state.email == "") {
       isValid = false;
-      alert("Please enter your email Address.");
+      alert("Please enter your email address.");
     }
 
     if (this.state.password == "") {
@@ -71,10 +87,10 @@ class Reg extends React.Component {
           <TextInput
             type="text"
             style={styles.inputText}
-            label="username"
-            name="username"
-            onChangeText={(text) => this.setState({ nickname: text })}
-            placeholder="Enter username"
+            label="nickName"
+            name="nickName"
+            onChangeText={(text) => this.setState({ nickName: text })}
+            placeholder="Enter nickname"
             placeholderTextColor="white"
             id="username"
           />

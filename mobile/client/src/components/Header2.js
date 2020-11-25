@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#303030',
         height: 50,
         justifyContent: 'center',
-        width: '40%',
+        width: '75%',
         paddingLeft: 10
     },
     title: {

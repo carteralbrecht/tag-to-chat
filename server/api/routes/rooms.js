@@ -20,7 +20,7 @@ router.get('/', authenticateUser, async (req, res) => {
     return res.status(500).send(err);
   }
 
-  return res.status(200).send(rooms);
+  return res.status(200).send({rooms});
 });
 
 /*

@@ -4,6 +4,20 @@ const oktaClient = require('../lib/oktaClient');
 const got = require('got');
 const authenticateUser = require('../authMiddleware');
 
+router.get('/', authenticateUser, async (req, res) => {
+  const claims = res.locals.claims;
+  const userId = claims.userId;
+
+  let user;
+  try {
+    user = await oktaClient.getUser(userId);
+  } catch (err) {
+    return res.status(500).send(err);
+  }
+
+  return res.status(200).send({user});
+})
+
 router.post('/updateProfile', authenticateUser, async (req, res) => {
   if (!req.body) return res.sendStatus(400);
 
@@ -45,13 +59,14 @@ router.post('/login', async (req, res) => {
       body: JSON.stringify({
         username: req.body.username,
         password: req.body.password,
-      }),
+      })
     }).json();
   } catch (err) {
     return res.status(500).send(err);
   }
 
-  return res.status(200).send({sessionToken: response.sessionToken});
+  const sessionToken = response.sessionToken;
+  return res.status(200).send({sessionToken});
 });
 
 router.post('/forgot', async (req, res) => {
@@ -74,7 +89,7 @@ router.post('/forgot', async (req, res) => {
         'Content-Type': 'application/json',
         'Authorization': `SSWS ${process.env.OKTA_TOKEN}`,
       },
-    }).json();
+    });
   } catch (err) {
     return res.status(500).send(err);
   }

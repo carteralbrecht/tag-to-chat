@@ -5,6 +5,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import Login from "../../../client/src/screens/LoginScreen";
 import Chat from "../../../client/src/screens/MessageScreen";
 import Register from "../../../client/src/screens/Registration";
+import Dashboard from "../../../client/src/screens/Dashboard";
 
 const Stack = createStackNavigator();
 
@@ -14,6 +15,7 @@ export const AppNavigator = () => (
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="Register" component={Register} />
       <Stack.Screen name="Chat" component={Chat} />
+      <Stack.Screen name="Dashboard" component={Dashboard} />
     </Stack.Navigator>
   </NavigationContainer>
 );

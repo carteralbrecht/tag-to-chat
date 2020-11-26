@@ -13,8 +13,7 @@ router.post('/access', async (req, res) => {
 
     const qs = `client_id=${clientId}&sessionToken=${sessionToken}&response_type=token&scope=openid&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Flogin%2Fcallback&nonce=testNonce&state=testState`;
         
-    const url = `https://${oktaDomain}/oauth2/v1/authorize?${qs}`;
-    console.log('url: ', url);
+    const url = `https://${oktaDomain}/oauth2/default/v1/authorize?${qs}`;
     let response;
     try {
         response = await got(url, {

@@ -17,12 +17,59 @@ import {
 } from "react-native";
 import { Card, ListItem, Icon } from "react-native-elements";
 
-class Dashboard extends React.Component {
+import OktaClient from '../oktaClient.js';
 
-  state = {
-    email: "",
-    password: "",
-  };
+class Dashboard extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      params: this.props.route.params,
+      email: "",
+      password: "",
+      rooms: [],
+      isAuthenticated: true
+    };
+
+    this.oktaClient = new OktaClient(process.env.SERVER_URL);
+
+    if (this.state.params.accessToken) {
+      this.oktaClient.setAccessToken(this.state.params.accessToken);
+    } else {
+      // User needs to login
+      this.props.navigation.navigate('Login');
+    }
+  }
+
+  async checkUser() {
+    if (this.state.isAuthenticated) {
+      const response = await this.oktaClient.getUser();
+      if (response.err) {
+        return console.log(response.err);
+      }
+
+      const userInfo = response.user;
+      this.setState({ userInfo });
+    }
+  }
+
+  async updateRooms() {
+    const response = await this.oktaClient.getRooms();
+    if (response.err) {
+      return console.log(response.err);
+    }
+
+    const rooms = response.rooms;
+    this.setState({ rooms })
+  }
+
+  async componentDidMount() {
+    await this.checkUser();
+    await this.updateRooms();
+
+    // Socket stuff
+
+    // Join first room
+  }
 
   onContentSizeChange = (contentWidth, contentHeight) => {
     this.setState({ screenHeight: contentHeight });
@@ -59,66 +106,20 @@ class Dashboard extends React.Component {
 
         <Header2 title="Chat List:"/>
         <ScrollView style={ styles.cardContainer }>
-          <Card containerStyle={{ borderRadius: 10 }}>
-            <Card.Title>Chat 1</Card.Title>
-            <Text style={{marginBottom: 10}}>
-              Description for Chat 1
-            </Text>
-            <Card.Divider/>
-            <Button
-              title='Open'
-              onPress={() => Alert.alert('Chat 1 button pressed')}
-              color="#5102A1"
-            />
-          </Card> 
-          <Card containerStyle={{ borderRadius: 10 }}>
-            <Card.Title>Chat 2</Card.Title>
-            <Text style={{marginBottom: 10}}>
-              Description for Chat 2
-            </Text>
-            <Card.Divider/>
-            <Button
-              title='Open'
-              onPress={() => Alert.alert('Chat 2 button pressed')}
-              color="#5102A1"
-            />
-          </Card> 
-          <Card containerStyle={{ borderRadius: 10 }}>
-            <Card.Title>Chat 3</Card.Title>
-            <Text style={{marginBottom: 10}}>
-              Description for Chat 3
-            </Text>
-            <Card.Divider/>
-            <Button
-              title='Open'
-              onPress={() => Alert.alert('Chat 3 button pressed')}
-              color="#5102A1"
-            />
-          </Card> 
-          <Card containerStyle={{ borderRadius: 10 }}>
-            <Card.Title>Chat 4</Card.Title>
-            <Text style={{marginBottom: 10}}>
-              Description for Chat 4
-            </Text>
-            <Card.Divider/>
-            <Button
-              title='Open'
-              onPress={() => Alert.alert('Chat 4 button pressed')}
-              color="#5102A1"
-            />
-          </Card> 
-          <Card containerStyle={{ borderRadius: 10 }}>
-            <Card.Title>Chat 5</Card.Title>
-            <Text style={{marginBottom: 10}}>
-              Description for Chat 5
-            </Text>
-            <Card.Divider/>
-            <Button
-              title='Open'
-              onPress={() => Alert.alert('Chat 5 button pressed')}
-              color="#5102A1"
-            />
-          </Card> 
+          {this.state.rooms.map((room) => (
+            <Card containerStyle={{ borderRadius: 10 }}>
+              <Card.Title>{room.name}</Card.Title>
+              <Text style={{marginBottom: 10}}>
+                Tags: {room.tags.join(', ')}
+              </Text>
+              <Card.Divider/>
+              <Button
+                title='Open'
+                onPress={() => this.handleJoinRoom(room._id)}
+                color="#5102A1"
+              />
+            </Card> 
+          ))}
         </ScrollView>
     </View> 
     );

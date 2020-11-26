@@ -18,11 +18,11 @@ class LoginScreen extends React.Component {
       password: ""
     };
 
-    this.oktaClient = new OktaClient('192.168.86.31:5000');
+    this.oktaClient = new OktaClient(process.env.SERVER_URL);
   }
 
   async login() {
-    if (this.state.username == "") {
+    if (this.state.email == "") {
       return alert("Please enter your email");
     }
 
@@ -45,7 +45,7 @@ class LoginScreen extends React.Component {
     const accessToken = response.accessToken;
     this.setState({ accessToken });
 
-    this.props.navigation.navigate("Chat", this.state);
+    this.props.navigation.navigate("Dashboard", this.state);
   }
 
   render() {

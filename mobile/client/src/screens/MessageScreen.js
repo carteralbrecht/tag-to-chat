@@ -7,7 +7,8 @@ class MessageScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      nickname: this.props.route.params,
+      params: this.props.route.params,
+      nickname: '',
       chat: [],
     };
   }

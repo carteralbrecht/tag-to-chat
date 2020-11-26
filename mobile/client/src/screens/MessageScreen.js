@@ -4,10 +4,13 @@ import AddMessage from "../components/AddMessage";
 import ChatLog from "../components/ChatLog";
 
 class MessageScreen extends React.Component {
-  state = {
-    nickname: "Chris",
-    chat: [],
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      nickname: this.props.route.params,
+      chat: [],
+    };
+  }
 
   submitHandler = (text) => {
     this.setState((prevMessage) => {
@@ -16,6 +19,10 @@ class MessageScreen extends React.Component {
       };
     });
   };
+
+  async componentDidMount() {
+    console.log(this.props.route.params);
+  }
 
   render() {
     return (

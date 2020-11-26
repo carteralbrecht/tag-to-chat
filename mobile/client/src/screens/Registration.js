@@ -1,123 +1,146 @@
-import React from 'react';
-import {StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import React from "react";
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+
+import OktaClient from '../oktaClient.js';
 
 class Reg extends React.Component {
-    constructor() {
+  constructor() {
     super();
     this.state = {
-      username: "",
+      nickName: "",
       email: "",
       password: "",
-      confirmPassword: ""
+      confirmPassword: "",
     };
-     
+
+    this.oktaClient = new OktaClient('192.168.86.31:5000');
+
     this.handleSubmit = this.handleSubmit.bind(this);
   }
-     
-  handleSubmit(event) {
+
+  async handleSubmit(event) {
     event.preventDefault();
-  
-    if(this.validate()){
-        console.log(this.state);
-        alert('Registration Successful!');
+
+    if (!this.validate()) {
+      // Show errors on form
+      return;
     }
+
+    let response = await this.oktaClient.register(this.state);
+    if (response.err) {
+      return console.log(response.err);
+    }
+
+    if (!response.user) {
+      return console.log('Unknown error');
+    }
+
+    this.props.navigation.navigate("Login");
   }
-  
-  validate(){
-      let isValid = true; 
-  
-      if (this.state.username == undefined) {
+
+  validate() {
+    let isValid = true;
+
+    if (this.state.nickname == "") {
+      isValid = false;
+      alert("Please enter a nickname.");
+    }
+
+    if (this.state.email == "") {
+      isValid = false;
+      alert("Please enter your email address.");
+    }
+
+    if (this.state.password == "") {
+      isValid = false;
+      alert("Please enter a password.");
+    }
+
+    if (this.state.confirmPassword == "") {
+      isValid = false;
+      alert("Please confirm your password.");
+    }
+
+    if (
+      this.state.password !== "undefined" &&
+      this.state.confirmPassword !== "undefined"
+    ) {
+      if (this.state.password != this.state.confirmPassword) {
         isValid = false;
-        alert("Please enter a username.");
+        alert("Passwords do not match");
       }
-  
-      if (this.state.email == undefined) {
-        isValid = false;
-        alert("Please enter your email Address.");
-      } 
-  
-      if (this.state.password == undefined) {
-        isValid = false;
-        alert("Please enter a password.");
-      }
-  
-      if (this.state.confirmPassword == undefined) {
-        isValid = false;
-        alert("Please confirm your password.");
-      }
-  
-      if (this.state.password !== "undefined" && this.state.confirmPassword !== "undefined") {
-          
-        if (this.state.password != this.state.confirmPassword) {
-          isValid = false;
-          alert("Passwords do not match");
-        }
-      } 
-      return isValid;
+    }
+    return isValid;
   }
-     
+
   render() {
     return (
-      <View
-        style={styles.container}>
-        <Text style={styles.titleText}>Registration </Text>  
-          <View style={styles.inputView}>
-            <TextInput 
-              type="text" 
-              style={styles.inputText}
-              label="username"
-              name="username" 
-              onChangeText={text => this.setState({username:text})}
-              placeholder="Enter username"
-              placeholderTextColor="white" 
-              id="username" />
-          </View>
-  
-          <View style={styles.inputView} >
-            <TextInput 
-              type="text" 
-              style={styles.inputText}
-              onChangeText={text => this.setState({email:text})}
-              placeholder="Enter email"
-              placeholderTextColor="white"  
-              id="email" />
-          </View>
-   
-          <View style={styles.inputView}>
-            <TextInput 
-              type="password" 
-              style={styles.inputText}
-              label="password"
-              name="password" 
-              secureTextEntry={true}
-              onChangeText={text => this.setState({password:text})}
-              placeholder="Enter password"
-              placeholderTextColor="white"  
-              id="password" />
-          </View>
-  
-          <View style={styles.inputView}>
-            <TextInput 
-              type="password" 
-              style={styles.inputText}
-              label="Confirm Password"
-              name="confirmPassword" 
-              secureTextEntry={true}
-              onChangeText={text => this.setState({confirmPassword:text})}
-              placeholder="Confirm password"
-              placeholderTextColor="white"  
-              id="confirmPassword" />
-
-          </View>
-            <TouchableOpacity 
-              style={styles.registerBtn}
-              onPress={this.handleSubmit} >
-              <Text 
-                  style={styles.registerText}>Register!
-                  
-              </Text>
-            </TouchableOpacity>
+      <View style={styles.container}>
+        <Text style={styles.titleText}>Registration </Text>
+        <View style={styles.inputView}>
+          <TextInput
+            type="text"
+            style={styles.inputText}
+            label="nickName"
+            name="nickName"
+            onChangeText={(text) => this.setState({ nickName: text })}
+            placeholder="Enter nickname"
+            placeholderTextColor="white"
+            id="username"
+          />
         </View>
+
+        <View style={styles.inputView}>
+          <TextInput
+            type="text"
+            style={styles.inputText}
+            onChangeText={(text) => this.setState({ email: text })}
+            placeholder="Enter email"
+            placeholderTextColor="white"
+            id="email"
+          />
+        </View>
+
+        <View style={styles.inputView}>
+          <TextInput
+            type="password"
+            style={styles.inputText}
+            label="password"
+            name="password"
+            secureTextEntry={true}
+            onChangeText={(text) => this.setState({ password: text })}
+            placeholder="Enter password"
+            placeholderTextColor="white"
+            id="password"
+          />
+        </View>
+
+        <View style={styles.inputView}>
+          <TextInput
+            type="password"
+            style={styles.inputText}
+            label="Confirm Password"
+            name="confirmPassword"
+            secureTextEntry={true}
+            onChangeText={(text) => this.setState({ confirmPassword: text })}
+            placeholder="Confirm password"
+            placeholderTextColor="white"
+            id="confirmPassword"
+          />
+        </View>
+        <TouchableOpacity
+          style={styles.registerBtn}
+          onPress={this.handleSubmit}
+        >
+          <Text style={styles.registerText}>Register!</Text>
+        </TouchableOpacity>
+      </View>
     );
   }
 }

@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import { Route, withRouter } from 'react-router-dom';
 
 import { Security, SecureRoute, LoginCallback } from '@okta/okta-react';
-import Home from './Home';
-import SignIn from './SignIn';
-import Chat from './Chat';
-import Navbar from './Navbar';
-import Register from './Register';
+import Home from '../home/home';
+import SignIn from '../signin/signin';
+import Navbar from '../navbar/navbar';
+import Register from '../register/register';
+import Dashboard from '../dashboard/dashboard';
 
 class AppRouter extends Component {
   constructor(props) {
@@ -30,7 +30,7 @@ class AppRouter extends Component {
             <Route path="/login/callback" component={LoginCallback} />
             <Route path='/login' render={() => <SignIn issuer='https://dev-1701617.okta.com/oauth2/default' />} />
             <Route path='/register' render={() => <Register issuer='https://dev-1701617.okta.com/oauth2/default' />} />
-            <SecureRoute path="/chat" component={Chat} />
+            <SecureRoute path="/dashboard" component={Dashboard} />
         </Security>
     );
   }

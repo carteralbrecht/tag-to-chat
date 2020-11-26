@@ -7,11 +7,46 @@ import {
   View,
 } from "react-native";
 
+import OktaClient from '../oktaClient.js';
+
 class LoginScreen extends React.Component {
-  state = {
-    email: "",
-    password: "",
-  };
+  constructor() {
+    super();
+    this.state = {
+      email: "",
+      username: "",
+      password: ""
+    };
+
+    this.oktaClient = new OktaClient('192.168.86.31:5000');
+  }
+
+  async login() {
+    if (this.state.username == "") {
+      return alert("Please enter your email");
+    }
+
+    if (this.state.password == "") {
+      return alert("Please enter your password");
+    }
+
+    let response = await this.oktaClient.signIn(this.state);
+    if (response.err) {
+      return console.log('Error signing in user: ', response.err);
+    }
+
+    const sessionToken = response.sessionToken;
+
+    response = await this.oktaClient.getAccessToken(sessionToken);
+    if (response.err) {
+      return console.log('Error getting access token: ', response.err);
+    }
+
+    const accessToken = response.accessToken;
+    this.setState({ accessToken });
+
+    this.props.navigation.navigate("Chat", this.state);
+  }
 
   render() {
     return (
@@ -37,20 +72,12 @@ class LoginScreen extends React.Component {
         <TouchableOpacity onPress={() => alert("Forgot Password?")}>
           <Text style={styles.forgot}>Forgot Password?</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.loginBtn}
-          onPress={() =>
-            alert(
-              "email: " +
-                this.state.email +
-                "\npassword: " +
-                this.state.password
-            )
-          }
-        >
+        <TouchableOpacity style={styles.loginBtn} onPress={() => this.login()}>
           <Text style={styles.loginText}>LOGIN</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => alert("Signup")}>
+        <TouchableOpacity
+          onPress={() => this.props.navigation.navigate("Register")}
+        >
           <Text style={styles.loginText}>Signup</Text>
         </TouchableOpacity>
       </View>

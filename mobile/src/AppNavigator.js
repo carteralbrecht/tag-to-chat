@@ -6,16 +6,40 @@ import Login from "./screens/LoginScreen";
 import Chat from "./screens/MessageScreen";
 import Register from "./screens/Registration";
 import Dashboard from "./screens/Dashboard";
+import DrawerNavigator from "./ChatDrawerNavigator";
 
 const Stack = createStackNavigator();
 
 export const AppNavigator = () => (
   <NavigationContainer>
-    <Stack.Navigator headerMode="none" initialRouteName="Login">
-      <Stack.Screen name="Login" component={Login} />
-      <Stack.Screen name="Register" component={Register} />
-      <Stack.Screen name="Chat" component={Chat} />
-      <Stack.Screen name="Dashboard" component={Dashboard} />
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: "#5102A1" },
+        headerTintColor: "white",
+        headerTitleStyle: { fontSize: 25 },
+      }}
+    >
+      <Stack.Screen
+        name="Login"
+        component={Login}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Register"
+        component={Register}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Chat"
+        component={Chat}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Dashboard"
+        component={Dashboard}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen name="Chat" component={DrawerNavigator} />
     </Stack.Navigator>
   </NavigationContainer>
 );

@@ -146,44 +146,44 @@ class Reg extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#303030",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  titleText: {
-    color: "white",
-    fontSize: 30,
-    marginBottom: 40,
-  },
-  inputView: {
-    width: "80%",
-    backgroundColor: "grey",
-    borderRadius: 25,
-    height: 50,
-    marginBottom: 20,
-    justifyContent: "center",
-    padding: 20,
-  },
-  inputText: {
-    color: "white",
-    height: 50,
-  },
-  registerText: {
-    color: "white",
-    fontSize: 14,
-  },
-  registerBtn: {
-    width: "80%",
-    backgroundColor: "#29a329",
-    borderRadius: 25,
-    height: 50,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 40,
-    marginBottom: 10,
-  },
-});
-
+    container: {
+        flex: 1,
+        backgroundColor: "#303030",
+        alignItems: "center",
+        justifyContent: "center"
+    },
+    titleText: {
+        color: "white",
+        fontSize: 30,
+        marginBottom: 40
+    },
+    inputView: {
+        width: "80%",
+        backgroundColor: "grey",
+        borderRadius: 25,
+        height: 50,
+        marginBottom: 20,
+        justifyContent: "center",
+        padding: 20
+    },
+    inputText: {
+        color: "white",
+        height: 50
+    },
+    registerText: {
+        color: "white",
+        fontSize: 14
+    },
+    registerBtn: {
+        width: "80%",
+        backgroundColor: "#5102A1",
+        borderRadius: 25,
+        height: 50,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 40,
+        marginBottom: 10
+    }
+})
+  
 export default Reg;

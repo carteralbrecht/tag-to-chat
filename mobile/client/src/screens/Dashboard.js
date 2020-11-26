@@ -36,14 +36,14 @@ class Dashboard extends React.Component {
         <View style={styles.fixToText}>
           <Icon
             name='face'
-            size='30'
+            size={30}
             color="#fff" 
             title="Profile"
             onPress={() => Alert.alert('Navigate to UpdateUser.js') }
           />
           <Icon
             name='search'
-            size='30'
+            size={30}
             color='#fff'
             title="Search"
             onPress={() => Alert.alert('Navigate to SearchChat.js')}

@@ -4,5 +4,5 @@ import LoginScreen from "./client/src/screens/LoginScreen";
 import MessageScreen from "./client/src/screens/MessageScreen";
 
 export default function App() {
-  return <MessageScreen />;
+  return <LoginScreen />;
 }

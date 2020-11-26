@@ -19,7 +19,7 @@ class Reg extends React.Component {
       confirmPassword: "",
     };
 
-    this.oktaClient = new OktaClient('192.168.86.31:5000');
+    this.oktaClient = new OktaClient(process.env.SERVER_URL);
 
     this.handleSubmit = this.handleSubmit.bind(this);
   }

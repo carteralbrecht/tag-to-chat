@@ -208,7 +208,7 @@ class Dashboard extends Component {
 
     this.setState({ activeRoom: '', chat: []});
 
-    console.log('Join room successful');
+    console.log('Leave room successful');
   }
 
   async handleJoinRoom(roomId) {

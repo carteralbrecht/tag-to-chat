@@ -37,7 +37,7 @@ class LoginScreen extends React.Component {
 
     const sessionToken = response.sessionToken;
 
-    response = await this.oktaClient.getAccessToken(sessionToken);
+    response = await this.oktaClient.generateAccessToken(sessionToken);
     if (response.err) {
       return console.log('Error getting access token: ', response.err);
     }
@@ -45,7 +45,7 @@ class LoginScreen extends React.Component {
     const accessToken = response.accessToken;
     this.setState({ accessToken });
 
-    this.props.navigation.navigate("Dashboard", this.state);
+    this.props.navigation.navigate("Dashboard", {accessToken: this.state.accessToken});
   }
 
   render() {

@@ -8,7 +8,14 @@ class OktaClient {
         this.accessUrl = `${this.serverUrl}/auth/access`;
 
         this.roomsUrl = `${this.serverUrl}/rooms`;
+        this.joinRoomUrl = `${this.roomsUrl}/join`;
+        this.leaveRoomUrl = `${this.roomsUrl}/leave`;
+
         this.usersUrl = `${this.serverUrl}/users`;
+    }
+
+    getAccessToken() {
+        return this.accessToken;
     }
 
     setAccessToken(accessToken) {
@@ -35,6 +42,52 @@ class OktaClient {
         const user = await response.json();
 
         return user;
+    }
+
+    async joinRoom(roomId) {
+        let response;
+        try {
+            response = await fetch(`${this.joinRoomUrl}/${roomId}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.accessToken}`
+                }
+            });
+        } catch (err) {
+            return {err};
+        }
+
+        if (response.status !== 200) {
+            return {err: 'Error joining room'};
+        }
+
+        const room = await response.json();
+        return room;
+    }
+
+    async leaveRoom(roomId) {
+        let response;
+        try {
+            response = await fetch(`${this.leaveRoomUrl}/${roomId}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.accessToken}`
+                }
+            });
+        } catch (err) {
+            return {err};
+        }
+
+        if (response.status !== 200) {
+            return {err: 'Error leaving room'};
+        }
+
+        const room = await response.json();
+        return room;
     }
 
     async getRooms() {
@@ -120,7 +173,7 @@ class OktaClient {
         return sessionToken;
     }
 
-    async getAccessToken(sessionToken) {
+    async generateAccessToken(sessionToken) {
         let response;
         try {
         response = await fetch(this.accessUrl, {

@@ -13,27 +13,27 @@ import {
   Button,
   Alert,
   Modal,
-  TouchableHighlight
+  TouchableHighlight,
+  TouchableHighlightBase
 } from "react-native";
 import { Card, ListItem, Icon } from "react-native-elements";
-
 import OktaClient from '../oktaClient.js';
 
 class Dashboard extends React.Component {
   constructor(props) {
     super(props);
+    const params = this.props.route.params;
     this.state = {
-      params: this.props.route.params,
+      accessToken: params.accessToken,
       email: "",
       password: "",
-      rooms: [],
-      isAuthenticated: true
+      rooms: []
     };
 
     this.oktaClient = new OktaClient(process.env.SERVER_URL);
 
-    if (this.state.params.accessToken) {
-      this.oktaClient.setAccessToken(this.state.params.accessToken);
+    if (this.state.accessToken) {
+      this.oktaClient.setAccessToken(this.state.accessToken);
     } else {
       // User needs to login
       this.props.navigation.navigate('Login');
@@ -41,15 +41,13 @@ class Dashboard extends React.Component {
   }
 
   async checkUser() {
-    if (this.state.isAuthenticated) {
-      const response = await this.oktaClient.getUser();
-      if (response.err) {
-        return console.log(response.err);
-      }
-
-      const userInfo = response.user;
-      this.setState({ userInfo });
+    const response = await this.oktaClient.getUser();
+    if (response.err) {
+      return console.log(response.err);
     }
+
+    const userInfo = response.user;
+    this.setState({ userInfo });
   }
 
   async updateRooms() {
@@ -62,13 +60,19 @@ class Dashboard extends React.Component {
     this.setState({ rooms })
   }
 
+  handleToChat(roomId) {
+    let data = {
+      accessToken: this.state.accessToken,
+      nickName: 'test',
+      activeRoom: roomId
+    }
+
+    this.props.navigation.navigate('Chat', data);
+  }
+
   async componentDidMount() {
     await this.checkUser();
     await this.updateRooms();
-
-    // Socket stuff
-
-    // Join first room
   }
 
   onContentSizeChange = (contentWidth, contentHeight) => {
@@ -115,7 +119,7 @@ class Dashboard extends React.Component {
               <Card.Divider/>
               <Button
                 title='Open'
-                onPress={() => this.handleJoinRoom(room._id)}
+                onPress={() => this.handleToChat(room._id)}
                 color="#5102A1"
               />
             </Card> 

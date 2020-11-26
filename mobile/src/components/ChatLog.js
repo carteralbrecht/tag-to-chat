@@ -1,12 +1,12 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 
-function ChatLog({ item, nickname }) {
+function ChatLog({content, nickname }) {
   return (
     <View style={styles.chatView}>
       <Text style={styles.nickname}>{nickname}</Text>
       <View style={styles.messageView}>
-        <Text style={styles.chatText}>{item}</Text>
+        <Text style={styles.chatText}>{content}</Text>
       </View>
     </View>
   );

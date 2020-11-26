@@ -56,8 +56,7 @@ class Dashboard extends React.Component {
       return console.log(response.err);
     }
 
-    const rooms = response.rooms;
-    this.setState({ rooms })
+    this.setState({ rooms: response.rooms ? response.rooms : [] });
   }
 
   handleToChat(roomId) {

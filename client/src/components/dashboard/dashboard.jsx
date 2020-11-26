@@ -146,7 +146,7 @@ class Dashboard extends Component {
     });
   
     const rooms = await response.json();
-    this.setState({ rooms })
+    this.setState(rooms)
   }
 
   async handleProfileUpdate() {

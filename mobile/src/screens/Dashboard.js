@@ -89,20 +89,20 @@ class Dashboard extends React.Component {
             size={30}
             color="#fff" 
             title="Profile"
-            onPress={() => Alert.alert('Navigate to UpdateUser.js') }
+            onPress={() => this.props.navigation.navigate("UpdateUser") }
           />
           <Icon
             name='search'
             size={30}
             color='#fff'
             title="Search"
-            onPress={() => Alert.alert('Navigate to SearchChat.js')}
+            onPress={() => this.props.navigation.navigate("SearchRooms") }
           />
           <Header title="Dashboard"/>
           <Button
             title="Log Out"
             color="#fff"
-            onPress={() => Alert.alert('Navigate to LoginScreen.js')}
+            onPress={() => this.props.navigation.navigate("Login") }
           />
         </View>
 

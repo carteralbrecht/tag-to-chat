@@ -60,21 +60,6 @@ class UpdateUser extends React.Component {
     const statusbar = (Platform.OS == 'ios') ? <View style={styles.statusbar}></View> : <View></View>;
     return (
       <View style={ styles.container }>
-        {statusbar}
-        <View style={styles.fixToText}>
-          <Icon
-            name='face'
-            size='30'
-            color="#fff"
-            title="Profile"
-          />
-          <Header title="Profile Settings"/>
-          <Button
-            title="Back"
-            color="#fff"
-            onPress={() => Alert.alert('Navigate to Dashboard.js')}
-          />
-        </View>
         <Header2 title="Update Information"/>
         <View style={styles.inputContainer}>
         <View style={styles.inputView}>

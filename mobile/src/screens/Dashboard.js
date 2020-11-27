@@ -66,7 +66,7 @@ class Dashboard extends React.Component {
       activeRoom: roomId
     }
 
-    this.props.navigation.navigate('Chat', data);
+    this.props.navigation.navigate('MessageScreen', data);
   }
 
   async componentDidMount() {

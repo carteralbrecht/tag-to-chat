@@ -30,25 +30,22 @@ class LoginScreen extends React.Component {
       return alert("Please enter your password");
     }
 
-    // let response = await this.oktaClient.signIn(this.state);
-    // if (response.err) {
-    //   return console.log('Error signing in user: ', response.err);
-    // }
+    let response = await this.oktaClient.signIn(this.state);
+    if (response.err) {
+      return console.log('Error signing in user: ', response.err);
+    }
 
-    // const sessionToken = response.sessionToken;
+    const sessionToken = response.sessionToken;
 
-    // response = await this.oktaClient.generateAccessToken(sessionToken);
-    // if (response.err) {
-    //   return console.log('Error getting access token: ', response.err);
-    // }
+    response = await this.oktaClient.generateAccessToken(sessionToken);
+    if (response.err) {
+      return console.log('Error getting access token: ', response.err);
+    }
 
-    // const accessToken = response.accessToken;
-    // this.setState({ accessToken });
+    const accessToken = response.accessToken;
+    this.setState({ accessToken });
 
-    // this.props.navigation.navigate("Dashboard", {accessToken: this.state.accessToken});
-    this.props.navigation.navigate("Dashboard");
-
-
+    this.props.navigation.navigate("Dashboard", {accessToken: this.state.accessToken});
   }
 
   render() {

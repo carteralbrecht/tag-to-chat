@@ -101,9 +101,9 @@ class Dashboard extends Component {
       queryResults: [],
       rooms: [],
       userInfo: {},
-      chatOpen: false,
       profileOpen: false,
-      searchOpen: false
+      searchOpen: false,
+      chatOpen: false
     }
 
     this.checkUser = this.checkUser.bind(this);
@@ -188,9 +188,6 @@ class Dashboard extends Component {
         chat: [...state.chat, msg],
       }), this.scrollToBottom);
     });
-
-    // Automatically join first room user is added to
-    if (this.state.rooms.length > 0) this.handleJoinRoom(this.state.rooms[0]._id);
   }
 
   async handleLeaveRoom(roomId) {
@@ -214,6 +211,7 @@ class Dashboard extends Component {
   }
 
   async handleJoinRoom(roomId) {
+
     // Leave old room before joining new
     if (this.state.activeRoom) {
       await this.handleLeaveRoom(roomId);
@@ -241,6 +239,8 @@ class Dashboard extends Component {
     this.setState((state) => ({
       chat: [...state.chat, ...messages],
     }), this.scrollToBottom);
+
+    this.handleChatOpen()
   }
 
   async handleAddRoom(roomId) {
@@ -392,6 +392,22 @@ class Dashboard extends Component {
               </Grid>
             </Paper>
           </Grid>
+
+          <Dialog
+            fullScreen
+            open={this.state.chatOpen}
+            onClose={this.handleChatClose}
+            TransitionComponent={Transition}
+            >
+            <AppBar className={classes.appBar}>
+              <Toolbar>
+                <IconButton edge="end" color="inherit" onClick={this.handleChatClose}>
+                  <CloseIcon />
+                </IconButton>
+              </Toolbar>
+            </AppBar>
+          </Dialog>
+
           <Grid item xs={9} style={{height: "100%"}}>
             <div id="chat" className="Chat">
               <Paper elevation={3}>

@@ -132,11 +132,11 @@ class Dashboard extends Component {
       userInfo.nickName = userInfo.nickname;
       userInfo.firstName = userInfo.given_name;
       userInfo.lastName = userInfo.family_name;
-      
+
       this.setState({ userInfo });
     }
   }
-  
+
   async updateRooms() {
     const accessToken = await this.props.authService.getAccessToken();
     const response = await fetch('/api/rooms', {
@@ -146,7 +146,7 @@ class Dashboard extends Component {
         'Authorization': `Bearer ${accessToken}`
       }
     });
-  
+
     const rooms = await response.json();
     this.setState(rooms)
   }
@@ -358,14 +358,14 @@ class Dashboard extends Component {
             >
               Dashboard
             </Typography>
-      
+
             <IconButton
               className={classes.profileButton}
               onClick={this.handleProfileOpen}
             >
               <FaceIcon display="inline" style={{ fontSize: '4rem' }} />
             </IconButton>
-      
+
             <IconButton
               className={classes.searchButton}
               onClick={this.handleSearchOpen}
@@ -379,13 +379,20 @@ class Dashboard extends Component {
                 {this.state.rooms.map((room) => (
                     <Grid item xs={12}>
                       <Typography>{room.name}</Typography>
-                      <Button 
+                      <Button
                         variant="contained"
                         color="primary"
                         type="button"
                         onClick={() => this.handleJoinRoom(room._id)}
                         >
-                        Join Room
+                        Join
+                      </Button>
+                      <Button
+                        variant = "contained"
+                        style={{backgroundColor: "#E83F1B"}}
+                        type="button"
+                        >
+                        Leave
                       </Button>
                     </Grid>
                 ))}

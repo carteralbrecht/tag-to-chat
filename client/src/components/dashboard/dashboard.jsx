@@ -8,6 +8,7 @@ import { DialogTitle, DialogContent, DialogContentText, DialogActions, TextField
 import CloseIcon from "@material-ui/icons/Close";
 import FaceIcon from "@material-ui/icons/Face";
 import SearchIcon from "@material-ui/icons/Search";
+import SearchBar from "material-ui-search-bar";
 import { withOktaAuth } from '@okta/okta-react';
 import BottomBar from '../chat/bottomBar';
 import './dashboard.css';
@@ -97,6 +98,7 @@ class Dashboard extends Component {
       chat: [],
       content: '',
       searchQuery: '',
+      queryResults: [],
       rooms: [],
       userInfo: {},
       chatOpen: false,
@@ -241,6 +243,18 @@ class Dashboard extends Component {
     }), this.scrollToBottom);
   }
 
+  async handleAddRoom(roomId) {
+    const accessToken = await this.props.authService.getAccessToken();
+    const response = await fetch(`/api/rooms/add/${roomId}`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+  }
+
   // Save the message the user is typing in the input field.
   handleContent(event) {
     this.setState({
@@ -292,8 +306,7 @@ class Dashboard extends Component {
     });
 
     const rooms = await response.json();
-    console.log(rooms);
-
+    this.setState({queryResults: rooms})
     this.setState({ searchInput: ''});
   }
 
@@ -304,7 +317,10 @@ class Dashboard extends Component {
   handleChatClose = () => this.setState({ chatOpen: false });
 
   handleSearchOpen = () => this.setState({ searchOpen: true });
-  handleSearchClose = () => this.setState({ searchOpen: false });
+  handleSearchClose = () => {
+    this.setState({ searchOpen: false });
+    this.setState({ queryResults: []});
+  }
 
 
 
@@ -461,35 +477,37 @@ class Dashboard extends Component {
 
         <Dialog open={this.state.searchOpen} onClose={this.handleSearchClose} aria-labelledby="form-dialog-title">
           <DialogTitle id="form-dialog-title">
-          <Grid container spacing={2} direction="row" alignItems="center">
-            <Grid item>
-              <SearchIcon style={{fontSize: '4rem'}}/>
-            </Grid>
-            <Grid item>
-              Search
-            </Grid>
-          </Grid>
           </DialogTitle>
           <DialogContent>
             <DialogContentText>
               Search for rooms using tags
             </DialogContentText>
-            <TextField
-              autoFocus
-              margin="dense"
-              id="query"
-              label="Search Query"
-              type="text"
-              onChange={this.handleSearchInput.bind(this)}
-              fullWidth
+            <SearchBar
+              value={this.state.value}
+              onChange={(newValue) => this.setState({searchInput: newValue})}
+              onRequestSearch={this.handleSearchSubmit.bind(this)}
             />
           </DialogContent>
+          <Grid container spacing={5} justify="center" align="center">
+            <Grid item>
+              {this.state.queryResults.map((room) => (
+                  <Grid item xs={200}>
+                    <Typography>{room.name}</Typography>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      type="button"
+                      onClick={() => this.handleAddRoom(room._id)}
+                      >
+                      Add Room
+                    </Button>
+                  </Grid>
+              ))}
+            </Grid>
+          </Grid>
           <DialogActions>
             <Button onClick={this.handleSearchClose} color="secondary">
               Cancel
-            </Button>
-            <Button onClick={this.handleSearchSubmit.bind(this)} color="primary">
-              Search
             </Button>
           </DialogActions>
         </Dialog>

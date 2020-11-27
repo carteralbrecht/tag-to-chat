@@ -389,7 +389,7 @@ class Dashboard extends Component {
                       </Button>
                       <Button
                         variant = "contained"
-                        style={{backgroundColor: "#E83F1B"}}
+                        style={{backgroundColor: "#E83F1B", color: "white"}}
                         type="button"
                         >
                         Leave

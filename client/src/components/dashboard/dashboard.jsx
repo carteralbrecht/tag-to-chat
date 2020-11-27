@@ -78,6 +78,11 @@ const useStyles = theme => ({
     padding: theme.spacing(2, 4, 3),
     margin: 'auto',
     marginTop: theme.spacing(-20)
+  },
+  newChatButton: {
+    color: "white",
+    marginTop: theme.spacing(-12),
+    marginLeft: theme.spacing(140)
   }
 });
 
@@ -371,6 +376,10 @@ class Dashboard extends Component {
               onClick={this.handleSearchOpen}
             >
               <SearchIcon display="inline" style={{ fontSize: '4rem' }} />
+            </IconButton>
+
+            <IconButton className={classes.newChatButton}>
+            <AddIcon display="indline" style={{fontSize: '4rem'}} />
             </IconButton>
           </Grid>
           <Grid item xs={2}>

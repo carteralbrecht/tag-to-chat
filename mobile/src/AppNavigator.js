@@ -6,6 +6,8 @@ import Login from "./screens/LoginScreen";
 import Chat from "./screens/MessageScreen";
 import Register from "./screens/Registration";
 import Dashboard from "./screens/Dashboard";
+import UpdateUser from "./screens/UpdateUser";
+import SearchRooms from "./screens/SearchRooms";
 import DrawerNavigator from "./ChatDrawerNavigator";
 
 const Stack = createStackNavigator();
@@ -27,11 +29,11 @@ export const AppNavigator = () => (
       <Stack.Screen
         name="Register"
         component={Register}
-        options={{ headerShown: false }}
+        options={{ headerShown: true }}
       />
       <Stack.Screen
         name="Chat"
-        component={Chat}
+        component={DrawerNavigator}
         options={{ headerShown: false }}
       />
       <Stack.Screen
@@ -39,7 +41,16 @@ export const AppNavigator = () => (
         component={Dashboard}
         options={{ headerShown: false }}
       />
-      <Stack.Screen name="Chat" component={DrawerNavigator} />
+      <Stack.Screen
+        name="UpdateUser"
+        component={UpdateUser}
+        options={{ headerShown: true }}
+      />
+      <Stack.Screen
+        name="SearchRooms"
+        component={SearchRooms}
+        options={{ headerShown: true }}
+      />
     </Stack.Navigator>
   </NavigationContainer>
 );

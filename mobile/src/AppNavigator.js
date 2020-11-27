@@ -3,7 +3,7 @@ import "react-native-gesture-handler";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import Login from "./screens/LoginScreen";
-import Chat from "./screens/MessageScreen";
+import MessageScreen from "./screens/MessageScreen";
 import Register from "./screens/Registration";
 import Dashboard from "./screens/Dashboard";
 import DrawerNavigator from "./ChatDrawerNavigator";
@@ -30,8 +30,8 @@ export const AppNavigator = () => (
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="Chat"
-        component={Chat}
+        name="MessageScreen"
+        component={MessageScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen

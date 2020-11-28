@@ -1,8 +1,8 @@
 const express = require('express');
 const app = express();
-const http = require('http').Server(app);
+const server = require('http').createServer(app);
 const path = require('path');
-const io = require('socket.io')(http);
+const io = require('socket.io')(server);
 
 const validateToken = require('./api/lib/validateToken');
 
@@ -34,9 +34,10 @@ io.on('connection', (socket) => {
     const {roomActive, nickName, email} = claims;
 
     socket.join(roomActive);
-    io.to(roomActive).emit('push',
-        `${nickName ? nickName : email} has joined the room`,
-    );
+    io.to(roomActive).emit('push', {
+      name: 'Server',
+      content: `${nickName ? nickName : email} has joined the room`
+    });
   });
 
   socket.on('leaveRoom', async (accessToken) => {
@@ -44,11 +45,11 @@ io.on('connection', (socket) => {
     const {roomActive, nickName, email} = claims;
 
     socket.leave(roomActive);
-    io.to(roomActive).emit('push',
-        `${nickName ? nickName : email} has left the room`,
-    );
+    io.to(roomActive).emit('push', {
+      name: 'Server',
+      content: `${nickName ? nickName : email} has left the room`
+    });
   });
-
 
   // Listen to connected users for a new message.
   socket.on('message', async (msg) => {
@@ -100,6 +101,6 @@ io.on('connection', (socket) => {
   });
 });
 
-http.listen(port, () => {
+server.listen(port, () => {
   console.log('listening on *:' + port);
 });

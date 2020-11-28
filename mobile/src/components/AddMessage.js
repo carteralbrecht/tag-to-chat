@@ -8,29 +8,41 @@ import {
   SafeAreaView,
 } from "react-native";
 
+import {Icon} from "react-native-elements";
+
 function AddMessage({ submitHandler }) {
   const [text, setText] = useState("");
+  const [height, setHeight] = useState(0);
 
-  const changeHandler = (val) => {
+  const textChangeHandler = (val) => {
     setText(val);
   };
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS == "android" ? "height" : "padding"}
-      keyboardVerticalOffset={85}
     >
       <View style={styles.inputBckrnd}>
         <View style={styles.inputView}>
           <TextInput
-            style={styles.inputText}
+            style={[styles.default, {height: Math.min(100, Math.max(25, height))}]}
             placeholder="Aa"
-            onChangeText={changeHandler}
+            keyboardAppearance="dark"
+            multiline={true}
+            clearTextOnFocus={true}
+            onChangeText={textChangeHandler}
+            onContentSizeChange={(event) => {
+              setHeight(event.nativeEvent.contentSize.height);
+            }}
           />
         </View>
-        <View style={styles.btnView}>
-          <Button onPress={() => submitHandler(text)} title="" color="grey" />
-        </View>
+        <Icon
+          reverse
+          name="send"
+          onPress={() => submitHandler(text)}
+          color="white"
+          reverseColor="#5102A1"
+        />
       </View>
     </KeyboardAvoidingView>
   );
@@ -39,32 +51,28 @@ function AddMessage({ submitHandler }) {
 const styles = StyleSheet.create({
   inputBckrnd: {
     backgroundColor: "#5102A1",
-    height: 70,
     alignItems: "center",
     flexDirection: "row",
     justifyContent: "space-evenly",
   },
 
   inputView: {
-    width: "60%",
-    backgroundColor: "grey",
+    width: "80%",
+    backgroundColor: "white",
     borderRadius: 25,
-    height: 25,
-    padding: 20,
-    marginLeft: 80,
-    justifyContent: "center",
-  },
-
-  inputText: {
-    color: "white",
-    height: 50,
+    padding: 10,
+    marginTop: 10,
+    marginBottom: 10
   },
 
   btnView: {
-    width: 30,
-    backgroundColor: "grey",
-    height: 30,
+    backgroundColor: "white",
+    borderRadius: 25,
   },
+
+  sendBtn: {
+    backgroundColor: "white"
+  }
 });
 
 export default AddMessage;

@@ -4,6 +4,7 @@ const Room = require('../../models/Room');
 const {v4: uuidv4} = require('uuid');
 const oktaClient = require('../lib/oktaClient');
 const authenticateUser = require('../authMiddleware');
+const {getRoomsAdded, getRoomsOwned} = require('../lib/helpers');
 
 /*
     - Gets all rooms a user is added to

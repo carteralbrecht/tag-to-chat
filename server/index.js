@@ -4,6 +4,13 @@ const server = require('http').createServer(app);
 const path = require('path');
 const io = require('socket.io')(server);
 
+// Limit an IP to 100 requests per 5 mintues
+const rateLimit = require('express-rate-limit');
+const limiter = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  max: 100
+});
+
 const validateToken = require('./api/lib/validateToken');
 const oktaClient = require('./api/lib/oktaClient');
 
@@ -21,6 +28,8 @@ mongoose.connect(uri, {
   useUnifiedTopology: true,
   useNewUrlParser: true,
 });
+
+app.use(limiter);
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'client', 'build')));

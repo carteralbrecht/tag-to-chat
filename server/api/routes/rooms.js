@@ -4,13 +4,15 @@ const Room = require('../../models/Room');
 const {v4: uuidv4} = require('uuid');
 const oktaClient = require('../lib/oktaClient');
 const authenticateUser = require('../authMiddleware');
+const {getRoomsAdded, getRoomsOwned} = require('../lib/helpers');
 
 /*
     - Gets all rooms a user is added to
     - Pulls from user authenticaion claims
 */
 router.get('/', authenticateUser, async (req, res) => {
-  const roomsAdded = res.locals.claims.roomsAdded;
+  const userId = res.locals.claims.userId;
+  const roomsAdded = await getRoomsAdded(userId);
 
   let rooms;
   try {
@@ -108,7 +110,8 @@ router.post('/create', authenticateUser, async (req, res) => {
 */
 router.get('/code/:roomId', authenticateUser, async (req, res) => {
   const roomId = req.params.roomId;
-  const roomsOwned = res.locals.claims.roomsOwned;
+  const userId = res.locals.claims.userId;
+  const roomsOwned = await getRoomsOwned(userId);
 
   // Check user claims before executing transaction
   if (!roomsOwned || !roomsOwned.includes(roomId)) return res.sendStatus(403);
@@ -128,7 +131,8 @@ router.get('/code/:roomId', authenticateUser, async (req, res) => {
 */
 router.post('/code/:roomId', authenticateUser, async (req, res) => {
   const roomId = req.params.roomId;
-  const roomsOwned = res.locals.claims.roomsOwned;
+  const userId = res.locals.claims.usrId;
+  const roomsOwned = await getRoomsOwned(userId);
 
   // Check user claims before executing transaction
   if (!roomsOwned || !roomsOwned.includes(roomId)) return res.sendStatus(403);
@@ -152,7 +156,8 @@ router.post('/code/:roomId', authenticateUser, async (req, res) => {
 */
 router.delete('/delete/:roomId', authenticateUser, async (req, res) => {
   const roomId = req.params.roomId;
-  const roomsOwned = res.locals.claims.roomsOwned;
+  const userId = res.locals.claims.userId;
+  const roomsOwned = await getRoomsOwned(userId);
 
   // Check user claims before executing transaction
   if (!roomsOwned || !roomsOwned.includes(roomId)) return res.sendStatus(403);
@@ -173,9 +178,8 @@ router.delete('/delete/:roomId', authenticateUser, async (req, res) => {
 */
 router.post('/leave/:roomId', authenticateUser, async (req, res) => {
   const roomId = req.params.roomId;
-  const claims = res.locals.claims;
-  const userId = claims.userId;
-  const roomsAdded = claims.roomsAdded;
+  const userId = res.locals.claims.userId;
+  const roomsAdded = await getRoomsAdded(userId);
 
   // Check user claims before executing transaction
   if (!roomsAdded || !roomsAdded.includes(roomId)) return res.sendStatus(403);
@@ -204,9 +208,8 @@ router.post('/leave/:roomId', authenticateUser, async (req, res) => {
 */
 router.post('/join/:roomId', authenticateUser, async (req, res) => {
   const roomId = req.params.roomId;
-  const claims = res.locals.claims;
-  const userId = claims.userId;
-  const roomsAdded = claims.roomsAdded;
+  const userId = res.locals.claims.userId;
+  const roomsAdded = await getRoomsAdded(userId);
 
   // Check user claims before executing transaction
   if (!roomsAdded || !roomsAdded.includes(roomId)) return res.sendStatus(403);
@@ -279,9 +282,8 @@ router.post('/add/:roomId', authenticateUser, async (req, res) => {
 */
 router.post('/remove/:roomId', authenticateUser, async (req, res) => {
   const roomId = req.params.roomId;
-  const claims = res.locals.claims;
-  const userId = claims.userId;
-  const roomsOwned = claims.roomsOwned;
+  const userId = res.locals.claims.userId;
+  const roomsOwned = await getRoomsOwned(userId);
 
   // Check user claims before executing transaction
   if (!roomsOwned || !roomsOwned.includes(roomId)) return res.sendStatus(403);

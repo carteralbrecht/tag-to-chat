@@ -17,6 +17,7 @@ class MessageScreen extends React.Component {
     this.state = {
       accessToken: params.accessToken,
       activeRoom: params.activeRoom,
+      userId: params.userId,
       nickName: params.nickName,
       name: '',
       chat: [],
@@ -33,35 +34,37 @@ class MessageScreen extends React.Component {
   }
 
   async componentDidMount() {
-    // Socket stuff
-    this.socket = io(process.env.SERVER_URL);
+    this.props.navigation.addListener('focus', async () => {
+      // Socket stuff
+      this.socket = io(process.env.SERVER_URL);
 
-    this.socket.on('connect', () => {
+      this.socket.on('connect', () => {
+        if (this.state.activeRoom) {
+          this.handleJoinRoom(this.state.activeRoom);
+        } else {
+          this.props.navigation.navigate('Login');
+        }
+      });
+
+      this.socket.on('messageError', (err) => {
+        alert('error sending message');
+        console.log(err);
+      });
+
+      // Update the chat if a new message is broadcasted.
+      this.socket.on('push', (msg) => {
+        this.setState((state) => ({
+          chat: [...state.chat, msg],
+        }));
+      });
+    });
+
+    this.props.navigation.addListener('blur', async () => {
       if (this.state.activeRoom) {
-        this.handleJoinRoom(this.state.activeRoom);
-      } else {
-        this.props.navigation.navigate('Login');
+        this.socket.disconnect();
+        await this.handleLeaveRoom(this.state.activeRoom);
       }
     });
-
-    this.socket.on('messageError', (err) => {
-      alert('error sending message');
-      console.log(err);
-    });
-
-    // Update the chat if a new message is broadcasted.
-    this.socket.on('push', (msg) => {
-      this.setState((state) => ({
-        chat: [...state.chat, msg],
-      }));
-    });
-  }
-
-  async componentWillUnmount() {
-    if (this.state.activeRoom) {
-      this.socket.disconnect();
-      await this.handleLeaveRoom(this.state.activeRoom);
-    }
   }
 
   // Call this when the user wants to go back to dashboard
@@ -85,14 +88,13 @@ class MessageScreen extends React.Component {
 
     console.log('Leave room successful');
 
-    this.props.navigation.navigate('Dashboard', {accessToken: this.state.accessToken});
+    this.props.navigation.navigate('Dashboard');
   }
 
   async handleJoinRoom(roomId) {
     const accessToken = this.oktaClient.getAccessToken();
     const response = await this.oktaClient.joinRoom(roomId);
     if (response.err) {
-      console.log('error');
       return console.log(response.err);
     }
 
@@ -137,11 +139,9 @@ class MessageScreen extends React.Component {
         <AutoScrollFlatList
           style={styles.messageBlock}
           data={this.state.chat}
-          threshold={20}
           renderItem={({ item }) => (
-            <ChatLog content={item.content} nickname={item.name} isSelf={item.name === this.state.nickName} />
+            <ChatLog key={item._id} content={item.content} nickname={item.name} isSelf={item.userId === this.state.userId} />
           )}
-          keyExtractor={(item) => item._id}
         />
         <AddMessage submitHandler={this.submitHandler.bind(this)} />
       </SafeAreaView>

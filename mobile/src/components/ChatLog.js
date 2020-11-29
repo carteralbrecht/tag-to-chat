@@ -8,7 +8,7 @@ function ChatLog({content, nickname, isSelf }) {
   let facadeContent;
 
   if (tooLong) {
-    facadeContent = content.substring(0, 451) + "...";
+    facadeContent = content.substring(0, 400) + "...Click for more";
   }
 
   const pressHandler = () => {

@@ -25,32 +25,50 @@ export const AppNavigator = () => (
       <Stack.Screen
         name="Login"
         component={Login}
-        options={{ headerShown: false }}
+        options={{ 
+          headerShown: false,
+          gestureEnabled: false
+        }}
       />
       <Stack.Screen
         name="Register"
         component={Register}
-        options={{ headerShown: true }}
+        options={{ 
+          headerShown: true,
+          gestureEnabled: false
+        }}
       />
       <Stack.Screen
-        name="MessageScreen"
+        name="Chat"
         component={MessageScreen}
-        options={{ headerShown: false }}
+        options={{ 
+          headerShown: false,
+          gestureEnabled: false
+        }}
       />
       <Stack.Screen
         name="Dashboard"
         component={Dashboard}
-        options={{ headerShown: false }}
+        options={{ 
+          headerShown: false,
+          gestureEnabled: false
+        }}
       />
       <Stack.Screen
-        name="UpdateUser"
+        name="Profile"
         component={UpdateUser}
-        options={{ headerShown: true }}
+        options={{ 
+          headerShown: true,
+          gestureEnabled: false
+        }}
       />
       <Stack.Screen
-        name="SearchRooms"
+        name="Search"
         component={SearchRooms}
-        options={{ headerShown: true }}
+        options={{ 
+          headerShown: true,
+          gestureEnabled: false
+        }}
       />
       <Stack.Screen
         name="AddRoom"

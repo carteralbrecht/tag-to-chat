@@ -71,7 +71,7 @@ class OktaClient {
         let response;
         try {
             response = await fetch(`${this.leaveRoomUrl}/${roomId}`, {
-                method: 'GET',
+                method: 'POST',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',

@@ -62,11 +62,11 @@ class Dashboard extends React.Component {
   handleToChat(roomId) {
     let data = {
       accessToken: this.state.accessToken,
-      nickName: 'test',
+      nickName: this.state.userInfo.profile.nickName,
       activeRoom: roomId
     }
 
-    this.props.navigation.navigate('MessageScreen', data);
+    this.props.navigation.navigate('Chat', data);
   }
 
   async componentDidMount() {
@@ -96,7 +96,7 @@ class Dashboard extends React.Component {
             size={30}
             color='#fff'
             title="Search"
-            onPress={() => this.props.navigation.navigate("SearchRooms") }
+            onPress={() => this.props.navigation.navigate("Search") }
           />
           <Header title="Dashboard"/>
           <Icon
@@ -104,7 +104,7 @@ class Dashboard extends React.Component {
             size={30}
             color="#fff" 
             title="Profile"
-            onPress={() => this.props.navigation.navigate("UpdateUser") }
+            onPress={() => this.props.navigation.navigate("Profile") }
           />
           <Button
             title="Log Out"
@@ -116,7 +116,7 @@ class Dashboard extends React.Component {
 
         <ScrollView style={ styles.cardContainer }>
           {this.state.rooms.map((room) => (
-            <Card containerStyle={{ borderRadius: 10 }}>
+            <Card key={room._id} containerStyle={{ borderRadius: 10 }}>
               <Card.Title>{room.name}</Card.Title>
               <Text style={{marginBottom: 10}}>
                 Tags: {room.tags.join(', ')}

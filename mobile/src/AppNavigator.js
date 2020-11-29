@@ -9,6 +9,7 @@ import Dashboard from "./screens/Dashboard";
 import UpdateUser from "./screens/UpdateUser";
 import SearchRooms from "./screens/SearchRooms";
 import DrawerNavigator from "./ChatDrawerNavigator";
+import AddRoom from "./screens/AddRoom";
 
 const Stack = createStackNavigator();
 
@@ -68,6 +69,11 @@ export const AppNavigator = () => (
           headerShown: true,
           gestureEnabled: false
         }}
+      />
+      <Stack.Screen
+        name="AddRoom"
+        component={AddRoom}
+        options={{ headerShown: true }}
       />
     </Stack.Navigator>
   </NavigationContainer>

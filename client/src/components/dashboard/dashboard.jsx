@@ -1,18 +1,35 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 import config from '../../config';
 import io from 'socket.io-client';
-import { Button, IconButton, Typography, Slide, Dialog, AppBar, Toolbar, MuiThemeProvider, CssBaseline} from "@material-ui/core";
-import { Grid, Paper } from "@material-ui/core";
-import { createMuiTheme, withStyles} from "@material-ui/core/styles";
-import { DialogTitle, DialogContent, DialogContentText, DialogActions, TextField } from "@material-ui/core";
+import {
+  AppBar,
+  Button,
+  CssBaseline,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Grid,
+  IconButton,
+  MuiThemeProvider,
+  Paper,
+  Slide,
+  TextField,
+  Toolbar,
+  Typography
+} from "@material-ui/core";
+import {createMuiTheme, withStyles} from "@material-ui/core/styles";
+import Checkbox from "@material-ui/core/Checkbox";
 import CloseIcon from "@material-ui/icons/Close";
 import FaceIcon from "@material-ui/icons/Face";
 import SearchIcon from "@material-ui/icons/Search";
 import SearchBar from "material-ui-search-bar";
 import AddIcon from "@material-ui/icons/Add";
-import { withOktaAuth } from '@okta/okta-react';
+import {withOktaAuth} from '@okta/okta-react';
 import BottomBar from '../chat/bottomBar';
 import './dashboard.css';
+import FormControlLabel from "@material-ui/core/FormControlLabel";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="down" ref={ref} {...props} />;
@@ -107,9 +124,11 @@ class Dashboard extends Component {
       queryResults: [],
       rooms: [],
       userInfo: {},
+      createRoomInfo: {},
+      chatOpen: false,
       profileOpen: false,
       searchOpen: false,
-      chatOpen: false
+      createRoomOpen: false,
     }
 
     this.checkUser = this.checkUser.bind(this);
@@ -117,6 +136,9 @@ class Dashboard extends Component {
 
     this.handleProfileOpen = this.handleProfileOpen.bind(this);
     this.handleProfileClose = this.handleProfileClose.bind(this);
+
+    this.handleCreateRoomOpen = this.handleCreateRoomOpen.bind(this);
+    this.handleCreateRoomClose = this.handleCreateRoomClose.bind(this);
 
     this.handleChatOpen = this.handleChatOpen.bind(this);
     this.handleChatClose = this.handleChatClose.bind(this);
@@ -127,6 +149,9 @@ class Dashboard extends Component {
     this.handleChange = this.handleChange.bind(this);
 
     this.handleProfileUpdate = this.handleProfileUpdate.bind(this);
+
+    this.handleCreateRoom = this.handleCreateRoom.bind(this);
+    this.handleCreateRoomChange = this.handleCreateRoomChange.bind(this);
   }
 
   async checkUser() {
@@ -216,6 +241,24 @@ class Dashboard extends Component {
     console.log('Leave room successful');
   }
 
+  async handleCreateRoom() {
+    const nameOfRoom = this.state.createRoomInfo.name;
+    const tags = [];
+    tags.push(this.state.createRoomInfo.tags);
+    const accessToken = await this.props.authService.getAccessToken();
+    const response = await fetch(`/api/rooms/create`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      },
+      body: JSON.stringify({name: nameOfRoom, tags: tags})
+    });
+
+    await this.updateRooms();
+  }
+
   async handleJoinRoom(roomId) {
 
     // Leave old room before joining new
@@ -266,6 +309,21 @@ class Dashboard extends Component {
     this.setState({
       content: event.target.value,
     });
+  }
+
+  handlePrivateCheckboxChange(event, checked) {
+    const newState = this.state.createRoomInfo;
+    newState.privateChecked = checked;
+
+    this.setState({ createRoomInfo: newState });
+  };
+
+  handleCreateRoomChange(event) {
+    const newState = this.state.createRoomInfo;
+    const { name, value } = event.target;
+    newState[name] = value;
+
+    this.setState({ createRoomInfo: newState });
   }
 
   // Save the query the user is typing in the search input field
@@ -319,6 +377,9 @@ class Dashboard extends Component {
   handleProfileOpen = () => this.setState({ profileOpen: true, profileError: '' });
   handleProfileClose = () => this.setState({ profileOpen: false });
 
+  handleCreateRoomOpen = () => this.setState({createRoomOpen: true});
+  handleCreateRoomClose = () => this.setState({createRoomOpen: false});
+
   handleChatOpen = () => this.setState({ chatOpen: true });
   handleChatClose = () => this.setState({ chatOpen: false });
 
@@ -327,8 +388,6 @@ class Dashboard extends Component {
     this.setState({ searchOpen: false });
     this.setState({ queryResults: []});
   }
-
-
 
   handleChange(e) {
     const userInfo = this.state.userInfo;
@@ -379,7 +438,10 @@ class Dashboard extends Component {
               <SearchIcon display="inline" style={{ fontSize: '4rem' }} />
             </IconButton>
 
-            <IconButton className={classes.newChatButton}>
+            <IconButton
+                className={classes.newChatButton}
+                onClick={this.handleCreateRoomOpen}
+            >
             <AddIcon display="indline" style={{fontSize: '4rem'}} />
             </IconButton>
           </Grid>
@@ -541,6 +603,54 @@ class Dashboard extends Component {
           <DialogActions>
             <Button onClick={this.handleSearchClose} color="secondary">
               Cancel
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog open={this.state.createRoomOpen} onClose={this.handleCreateRoomClose} aria-labelledby="form-dialog-title">
+          <DialogTitle id="form-dialog-title">
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Create a Room
+            </DialogContentText>
+            <TextField
+                autoFocus
+                margin="dense"
+                name="name"
+                label="Room Name"
+                type="text"
+                value={this.state.createRoomInfo.name}
+                onChange={this.handleCreateRoomChange}
+                fullWidth
+            />
+            <TextField
+                autoFocus
+                margin="dense"
+                name="tags"
+                label="Room Tags"
+                type="text"
+                value={this.state.createRoomInfo.tags}
+                onChange={this.handleCreateRoomChange}
+                fullWidth
+            />
+            <FormControlLabel
+              control ={
+                <Checkbox
+                    checked={this.state.createRoomInfo.privateChecked}
+                    name="privateChecked"
+                    color="primary"
+                />
+              }
+              label="Private"
+              />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleCreateRoomClose} color="secondary">
+              Cancel
+            </Button>
+            <Button onClick={this.handleCreateRoom} color="primary">
+              Create
             </Button>
           </DialogActions>
         </Dialog>

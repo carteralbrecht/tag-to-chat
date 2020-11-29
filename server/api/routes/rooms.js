@@ -52,13 +52,14 @@ router.post('/create', authenticateUser, async (req, res) => {
   if (!req.body) return res.sendStatus(400);
 
   const name = req.body.name;
-  const email = req.body.email;
   const private = req.body.private;
   const tags = req.body.tags;
 
+  const userId = res.locals.claims.userId;
+
   let user;
   try {
-    user = await oktaClient.getUser(email);
+    user = await oktaClient.getUser(userId);
   } catch (err) {
     return res.status(500).send(err);
   }

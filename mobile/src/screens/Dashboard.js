@@ -85,11 +85,11 @@ class Dashboard extends React.Component {
         {statusbar}
         <View style={styles.fixToText}>
           <Icon
-            name='face'
+            name='add'
             size={30}
-            color="#fff" 
-            title="Profile"
-            onPress={() => this.props.navigation.navigate("UpdateUser") }
+            color='#fff'
+            title="Search"
+            onPress={() => this.props.navigation.navigate("AddRoom") }
           />
           <Icon
             name='search'
@@ -99,15 +99,21 @@ class Dashboard extends React.Component {
             onPress={() => this.props.navigation.navigate("SearchRooms") }
           />
           <Header title="Dashboard"/>
+          <Icon
+            name='face'
+            size={30}
+            color="#fff" 
+            title="Profile"
+            onPress={() => this.props.navigation.navigate("UpdateUser") }
+          />
           <Button
             title="Log Out"
             color="#fff"
             onPress={() => this.props.navigation.navigate("Login") }
           />
         </View>
+            <Header2 title="Chat List:"/>
 
-
-        <Header2 title="Chat List:"/>
         <ScrollView style={ styles.cardContainer }>
           {this.state.rooms.map((room) => (
             <Card containerStyle={{ borderRadius: 10 }}>
@@ -141,6 +147,15 @@ const styles = StyleSheet.create({
   fixToText: {
     flexDirection: 'row',
     backgroundColor: "#5102A1",
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 10,
+    paddingLeft: 10,
+    paddingRight: 10
+  },
+  fixToText2: {
+    flexDirection: 'row',
+    backgroundColor: "#303030",
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingTop: 10,

@@ -83,7 +83,8 @@ const useStyles = theme => ({
   newChatButton: {
     color: "white",
     marginTop: theme.spacing(-12),
-    marginLeft: theme.spacing(140)
+    marginLeft: theme.spacing(140),
+    float: "right",
   }
 });
 

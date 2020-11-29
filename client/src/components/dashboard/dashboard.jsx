@@ -380,7 +380,7 @@ class Dashboard extends Component {
               <SearchIcon display="inline" style={{ fontSize: '4rem' }} />
             </IconButton>
 
-            <IconButton className={classes.newChatButton}>
+            <IconButton className={classes.newChatButton} justify="flex-end">
             <AddIcon display="indline" style={{fontSize: '4rem'}} />
             </IconButton>
           </Grid>

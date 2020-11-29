@@ -9,6 +9,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import FaceIcon from "@material-ui/icons/Face";
 import SearchIcon from "@material-ui/icons/Search";
 import SearchBar from "material-ui-search-bar";
+import AddIcon from "@material-ui/icons/Add";
 import { withOktaAuth } from '@okta/okta-react';
 import BottomBar from '../chat/bottomBar';
 import './dashboard.css';

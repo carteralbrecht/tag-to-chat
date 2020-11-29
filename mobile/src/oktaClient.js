@@ -12,6 +12,7 @@ class OktaClient {
         this.leaveRoomUrl = `${this.roomsUrl}/leave`;
 
         this.usersUrl = `${this.serverUrl}/users`;
+        this.updateProfileUrl = `${this.serverUrl}/users/updateProfile`;
     }
 
     getAccessToken() {
@@ -20,6 +21,29 @@ class OktaClient {
 
     setAccessToken(accessToken) {
         this.accessToken = accessToken;
+    }
+
+    async updateProfile(state) {
+        let response;
+        try {
+            response = await fetch(this.updateProfileUrl, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.accessToken}`
+                },
+                body: JSON.stringify(state)
+            });
+        } catch (err) {
+            return {err};
+        }
+
+        if (response.status !== 204) {
+            return {err: 'Error updating profile'};
+        }
+
+        return {};
     }
 
     async getUser() {
@@ -51,7 +75,6 @@ class OktaClient {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json',
                     'Authorization': `Bearer ${this.accessToken}`
                 }
             });
@@ -74,7 +97,6 @@ class OktaClient {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json',
                     'Authorization': `Bearer ${this.accessToken}`
                 }
             });

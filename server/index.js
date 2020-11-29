@@ -5,6 +5,7 @@ const path = require('path');
 const io = require('socket.io')(server);
 
 const validateToken = require('./api/lib/validateToken');
+const oktaClient = require('./api/lib/oktaClient');
 
 const uri = process.env.MONGODB_URI;
 const port = process.env.PORT || 5000;
@@ -31,7 +32,10 @@ app.use('/api/auth', authRouter);
 io.on('connection', (socket) => {
   socket.on('joinRoom', async (accessToken) => {
     const {claims} = await validateToken(accessToken);
-    const {roomActive, nickName, email} = claims;
+    const userId = claims.userId;
+
+    const user = await oktaClient.getUser(userId);
+    const {roomActive, nickName, email} = user.profile;
 
     socket.join(roomActive);
     io.to(roomActive).emit('push', {
@@ -42,7 +46,10 @@ io.on('connection', (socket) => {
 
   socket.on('leaveRoom', async (accessToken) => {
     const {claims} = await validateToken(accessToken);
-    const {roomActive, nickName, email} = claims;
+    const userId = claims.userId;
+
+    const user = await oktaClient.getUser(userId);
+    const {roomActive, nickName, email} = user.profile;
 
     socket.leave(roomActive);
     io.to(roomActive).emit('push', {
@@ -55,15 +62,19 @@ io.on('connection', (socket) => {
   socket.on('message', async (msg) => {
     const {accessToken, content} = msg;
     const {claims} = await validateToken(accessToken);
-    const {roomActive, nickName, email} = claims;
+    const userId = claims.userId;
+
+    const user = await oktaClient.getUser(userId);
+    const {roomActive, nickName, email} = user.profile;
 
     const conditions = {'_id': roomActive};
 
     // TODO: XSS protection
 
     const newMessage = {
-      name: nickName ? nickName : email,
+      userId,
       content,
+      name: nickName ? nickName : email
     };
 
     const update = {
@@ -82,7 +93,6 @@ io.on('connection', (socket) => {
     try {
       room = await Room.findOneAndUpdate(conditions, update, {new: true});
     } catch (err) {
-      console.log(err);
       return socket.emit('messageError', {err});
     }
 

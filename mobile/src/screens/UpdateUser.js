@@ -62,7 +62,7 @@ class UpdateUser extends React.Component {
       <View style={ styles.container }>
         <Header2 title="Update Information"/>
         <View style={styles.inputContainer}>
-        <View style={styles.inputView}>
+          <View style={styles.inputView}>
             <TextInput 
                 type="text" 
                 style={styles.inputText}
@@ -72,8 +72,8 @@ class UpdateUser extends React.Component {
                 placeholder="Nickname"
                 placeholderTextColor="white" 
                 id="nickname" />
-        </View>
-        <View style={styles.inputView}>
+          </View>
+          <View style={styles.inputView}>
             <TextInput 
                 type="text" 
                 style={styles.inputText}
@@ -83,8 +83,8 @@ class UpdateUser extends React.Component {
                 placeholder="First Name"
                 placeholderTextColor="white" 
                 id="firstName" />
-        </View>
-        <View style={styles.inputView}>
+          </View>
+          <View style={styles.inputView}>
             <TextInput 
                 type="text" 
                 style={styles.inputText}
@@ -94,19 +94,17 @@ class UpdateUser extends React.Component {
                 placeholder="Last Name"
                 placeholderTextColor="white" 
                 id="lastName" />
+          </View>
+          <TouchableOpacity 
+            style={styles.registerBtn}
+            onPress={this.handleSubmit} >
+            <Text 
+                style={styles.registerText}>Save Changes
+                
+            </Text>
+          </TouchableOpacity>
         </View>
-            <TouchableOpacity 
-              style={styles.registerBtn}
-              onPress={this.handleSubmit} >
-              <Text 
-                  style={styles.registerText}>Save Changes
-                  
-              </Text>
-            </TouchableOpacity>
-            </View>
-  
-        
-    </View> 
+      </View> 
     );
   }
 }
@@ -163,17 +161,17 @@ const styles = StyleSheet.create({
   registerText: {
     color: "white",
     fontSize: 14
-},
-registerBtn: {
-    width: "80%",
-    backgroundColor: "#5102A1",
-    borderRadius: 25,
-    height: 50,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 40,
-    marginBottom: 10
-}
+  },
+  registerBtn: {
+      width: "80%",
+      backgroundColor: "#5102A1",
+      borderRadius: 25,
+      height: 50,
+      justifyContent: "center",
+      alignItems: "center",
+      marginTop: 40,
+      marginBottom: 10
+  }
 });
 
 export default UpdateUser;

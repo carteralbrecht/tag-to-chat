@@ -486,6 +486,8 @@ class Dashboard extends Component {
                 </IconButton>
               </Toolbar>
             </AppBar>
+
+            <BottomBar />
           </Dialog>
 
           <Grid item xs={9} style={{height: "100%"}}>

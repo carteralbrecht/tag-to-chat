@@ -1,5 +1,4 @@
 import React from "react";
-import Header from "../components/Header";
 import Header2 from "../components/Header2";
 
 import {
@@ -7,43 +6,54 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
-  Button,
-  Alert,
-  TouchableHighlight,
+  View
 } from "react-native";
-import { Card, ListItem, Icon, CheckBox } from "react-native-elements"
+import { CheckBox } from "react-native-elements"
+import OktaClient from "../oktaClient.js";
 
-
-class AddRoom extends React.Component {
-    constructor() {
-        super();
+class CreateRoom extends React.Component {
+    constructor(props) {
+        super(props);
         this.state = {
-          roomName: "",
-          roomTags: "",
+          accessToken: this.props.route.params.accessToken,
+          name: "",
+          tags: "",
           private: true
         };
+
+        this.oktaClient = new OktaClient(process.env.SERVER_URL);
+
+        if (this.state.accessToken) {
+          this.oktaClient.setAccessToken(this.state.accessToken);
+        } else {
+          // User needs to login
+          this.props.navigation.navigate('Login');
+        }
          
         this.handleSubmit = this.handleSubmit.bind(this);
     }
          
-    handleSubmit(event) {
+    async handleSubmit(event) {
         event.preventDefault();
       
         if(this.validate()){
-            console.log(this.state);
+            const response = await this.oktaClient.createRoom(this.state);
+            if (response.err) {
+              return console.log(response.err);
+            }
+
             alert('Chat Room Created!');
         }
     }
     validate(){
         let isValid = true; 
     
-        if (this.state.roomName == "") {
+        if (this.state.name == "") {
           isValid = false;
           alert("Please enter a name for your room");
         }
     
-        if (this.state.roomTags == "") {
+        if (this.state.tags == "") {
           isValid = false;
           alert("Please enter at least one room tag");
         } 
@@ -52,7 +62,6 @@ class AddRoom extends React.Component {
     }
 
   render() {
-    const statusbar = (Platform.OS == 'ios') ? <View style={styles.statusbar}></View> : <View></View>;
     return (
       <View style={ styles.container }>
         <Header2 title="Create a Chat Room"/>
@@ -63,10 +72,11 @@ class AddRoom extends React.Component {
                 style={styles.inputText}
                 label="roomName"
                 name="roomName" 
-                onChangeText={text => this.setState({roomName:text})}
+                onChangeText={text => this.setState({name:text})}
                 placeholder="Chat Room Name"
                 placeholderTextColor="white" 
-                id="roomName" />
+                id="roomName"
+            />
         </View>
         <View style={styles.inputView}>
             <TextInput 
@@ -74,10 +84,11 @@ class AddRoom extends React.Component {
                 style={styles.inputText}
                 label="roomTags"
                 name="roomTags" 
-                onChangeText={text => this.setState({roomTags:text})}
+                onChangeText={text => this.setState({tags:text})}
                 placeholder="Chat Room Tags"
                 placeholderTextColor="white" 
-                id="roomTags" />
+                id="roomTags"
+            />
         </View>
         <View>
             <CheckBox
@@ -92,11 +103,9 @@ class AddRoom extends React.Component {
         </View>
             <TouchableOpacity 
               style={styles.registerBtn}
-              onPress={this.handleSubmit} >
-              <Text 
-                  style={styles.registerText}>Create Room
-                  
-              </Text>
+              onPress={this.handleSubmit}
+            >
+              <Text style={styles.registerText}>Create Room</Text>
             </TouchableOpacity>
         </View>
     </View> 
@@ -169,4 +178,4 @@ registerBtn: {
 }
 });
 
-export default AddRoom;
+export default CreateRoom;

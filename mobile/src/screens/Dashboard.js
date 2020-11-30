@@ -90,9 +90,8 @@ class Dashboard extends React.Component {
             size={30}
             color="#fff" 
             title="Profile"
-            onPress={() => this.props.navigation.navigate("Profile", {
-              accessToken: this.state.accessToken,
-              profile: this.state.profile
+            onPress={() => this.props.navigation.navigate("Create", {
+              accessToken: this.state.accessToken
             })}
           />
           <Icon
@@ -108,7 +107,10 @@ class Dashboard extends React.Component {
             size={30}
             color="#fff" 
             title="Profile"
-            onPress={() => this.props.navigation.navigate("Profile") }
+            onPress={() => this.props.navigation.navigate("Profile", {
+              accessToken: this.state.accessToken,
+              profile: this.state.profile
+            })}
           />
           <Button
             title="Log Out"

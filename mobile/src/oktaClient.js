@@ -13,7 +13,8 @@ class OktaClient {
         this.createRoomUrl = `${this.roomsUrl}/create`;
 
         this.usersUrl = `${this.serverUrl}/users`;
-        this.updateProfileUrl = `${this.serverUrl}/users/updateProfile`;
+        this.forgotUrl = `${this.usersUrl}/forgot`;
+        this.updateProfileUrl = `${this.usersUrl}/updateProfile`;
     }
 
     getAccessToken() {
@@ -22,6 +23,29 @@ class OktaClient {
 
     setAccessToken(accessToken) {
         this.accessToken = accessToken;
+    }
+
+    async forgot(state) {
+        let response;
+        try {
+            response = await fetch(this.forgotUrl, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.accessToken}`
+                },
+                body: JSON.stringify(state)
+            });
+        } catch (err) {
+            return {err};
+        }
+
+        if (response.status !== 200) {
+            return {err: 'Error forgetting password'};
+        }
+
+        return {};
     }
 
     async updateProfile(state) {

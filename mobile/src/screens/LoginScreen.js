@@ -5,6 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Modal
 } from "react-native";
 
 import OktaClient from '../oktaClient.js';
@@ -15,10 +16,27 @@ class LoginScreen extends React.Component {
     this.state = {
       email: "",
       username: "",
-      password: ""
+      password: "",
+      forgotOpen: false,
+      forgotErr: ""
     };
 
     this.oktaClient = new OktaClient(process.env.SERVER_URL);
+
+    this.handleForgot = this.handleForgot.bind(this);
+  }
+
+  async handleForgotToggle(){
+    this.setState({forgotOpen: !this.state.forgotOpen});
+  }
+
+  async handleForgot() {
+    const response = await this.oktaClient.forgot(this.state);
+    if (response.err) {
+      return console.log(response.err);
+    }
+
+    this.handleForgotToggle();
   }
 
   async login() {
@@ -69,7 +87,7 @@ class LoginScreen extends React.Component {
             onChangeText={(text) => this.setState({ password: text })}
           />
         </View>
-        <TouchableOpacity onPress={() => alert("Forgot Password?")}>
+        <TouchableOpacity onPress={() => this.handleForgotToggle()}>
           <Text style={styles.forgot}>Forgot Password?</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.loginBtn} onPress={() => this.login()}>
@@ -80,12 +98,61 @@ class LoginScreen extends React.Component {
         >
           <Text style={styles.loginText}>Signup</Text>
         </TouchableOpacity>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={this.state.forgotOpen}
+        >
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <Text style={styles.forgotText}>Enter your email below.  You will be sent an email containing a link to reset your password.</Text>
+                <View style={styles.forgotView}>
+                  <TextInput
+                    style={styles.inputText}
+                    placeholder="Email.."
+                    placeholderTextColor="white"
+                    value={this.state.email}
+                    onChangeText={(text) => this.setState({ email: text })}
+                  />
+                </View>
+                <TouchableOpacity style={styles.submitBtn} onPress={() => this.handleForgot()}>
+                  <Text style={styles.loginText}>Submit</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => this.handleForgotToggle()}>
+                  <Text style={styles.loginText}>Close</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+        </Modal>
       </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
+  centeredView: {
+    justifyContent: "center",
+    alignItems: "center",
+    flex: 1
+  },
+  modalView: {
+    width: "80%",
+    backgroundColor: "#303030",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 5
+  },
+  modalText: {
+    color: "white"
+  },
   container: {
     flex: 1,
     backgroundColor: "#303030",
@@ -106,6 +173,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 20,
   },
+  forgotView: {
+    width: "100%",
+    backgroundColor: "grey",
+    borderRadius: 25,
+    height: 50,
+    marginTop: 10,
+    justifyContent: "center",
+    padding: 20,
+  },
   inputText: {
     color: "white",
     height: 50,
@@ -118,6 +194,10 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 14,
   },
+  forgotText: {
+    color: "white",
+    fontSize: 14
+  },
   loginBtn: {
     width: "80%",
     backgroundColor: "#5102A1",
@@ -128,6 +208,16 @@ const styles = StyleSheet.create({
     marginTop: 40,
     marginBottom: 10,
   },
+  submitBtn: {
+    width: "40%",
+    backgroundColor: "#5102A1",
+    borderRadius: 25,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 10,
+    marginBottom: 10
+  }
 });
 
 export default LoginScreen;

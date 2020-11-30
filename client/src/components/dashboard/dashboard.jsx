@@ -30,6 +30,8 @@ import {withOktaAuth} from '@okta/okta-react';
 import BottomBar from '../chat/bottomBar.jsx';
 import './dashboard.css';
 import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Chat from "../chat/chat";
+import Card from "@material-ui/core/Card";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="down" ref={ref} {...props} />;
@@ -446,68 +448,30 @@ class Dashboard extends Component {
             <AddIcon display="inline" style={{fontSize: '4rem'}} />
             </IconButton>
           </Grid>
-          <Grid item xs={2}>
-            <Paper>
               <Grid container spacing={5} justify="center" align="center">
                 {this.state.rooms.map((room) => (
-                    <Grid item xs={12}>
-                      <Typography>{room.name}</Typography>
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        type="button"
-                        onClick={() => this.handleJoinRoom(room._id)}
-                        >
-                        Join
-                      </Button>
-                      <Button
-                        variant = "contained"
-                        style={{backgroundColor: "#E83F1B", color: "white"}}
-                        type="button"
-                        >
-                        Leave
-                      </Button>
+                    <Grid item xs={6} sm={3}>
+                        <Paper>
+                          <Typography>{room.name}</Typography>
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            type="button"
+                            onClick={() => this.handleJoinRoom(room._id)}
+                            >
+                            Join
+                          </Button>
+                          <Button
+                            variant = "contained"
+                            style={{backgroundColor: "#E83F1B", color: "white"}}
+                            type="button"
+                            >
+                            Remove
+                          </Button>
+                      </Paper>
                     </Grid>
                 ))}
               </Grid>
-            </Paper>
-          </Grid>
-
-          <Dialog
-            fullScreen
-            open={this.state.chatOpen}
-            onClose={this.handleChatClose}
-            TransitionComponent={Transition}
-            >
-            <AppBar className={classes.appBar}>
-              <Toolbar>
-                <IconButton edge="end" color="inherit" onClick={this.handleChatClose}>
-                  <CloseIcon />
-                </IconButton>
-              </Toolbar>
-            </AppBar>
-
-            <BottomBar />
-          </Dialog>
-
-          <Grid item xs={9} style={{height: "100%"}}>
-            <div id="chat" className="Chat">
-              <Paper elevation={3}>
-                {this.state.chat.map((el, index) => {
-                  return (
-                    <div key={index}>
-                      <Typography variant="caption" className="name">
-                        {el.name}
-                      </Typography>
-                      <Typography variant="body1" className="content">
-                        {el.content}
-                      </Typography>
-                    </div>
-                  );
-                })}
-              </Paper>
-            </div>
-          </Grid>
         </Grid>
 
         <Dialog open={this.state.profileOpen} onClose={this.handleProfileClose} aria-labelledby="form-dialog-title">
@@ -658,12 +622,6 @@ class Dashboard extends Component {
           onClose={this.handleChatClose}
           TransitionComponent={Transition}
         >
-          <BottomBar
-              content={this.state.content}
-              handleContent={this.handleContent.bind(this)}
-              handleSubmit={this.handleSubmit.bind(this)}
-              nickname={this.state.nickname}
-          />
           <AppBar className={classes.appBar}>
             <Toolbar>
               <IconButton edge="end" color="inherit" onClick={this.handleChatClose}>
@@ -671,6 +629,13 @@ class Dashboard extends Component {
               </IconButton>
             </Toolbar>
           </AppBar>
+          <Chat/>
+          <BottomBar
+              content={this.state.content}
+              handleContent={this.handleContent.bind(this)}
+              handleSubmit={this.handleSubmit.bind(this)}
+              nickname={this.state.nickname}
+          />
         </Dialog>
       </MuiThemeProvider>
     );

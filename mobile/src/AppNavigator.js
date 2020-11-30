@@ -9,7 +9,7 @@ import Dashboard from "./screens/Dashboard";
 import UpdateUser from "./screens/UpdateUser";
 import SearchRooms from "./screens/SearchRooms";
 import DrawerNavigator from "./ChatDrawerNavigator";
-import AddRoom from "./screens/AddRoom";
+import CreateRoom from "./screens/CreateRoom";
 
 const Stack = createStackNavigator();
 
@@ -71,8 +71,8 @@ export const AppNavigator = () => (
         }}
       />
       <Stack.Screen
-        name="AddRoom"
-        component={AddRoom}
+        name="Create"
+        component={CreateRoom}
         options={{ headerShown: true }}
       />
     </Stack.Navigator>

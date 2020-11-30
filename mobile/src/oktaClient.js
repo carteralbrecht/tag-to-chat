@@ -10,6 +10,7 @@ class OktaClient {
         this.roomsUrl = `${this.serverUrl}/rooms`;
         this.joinRoomUrl = `${this.roomsUrl}/join`;
         this.leaveRoomUrl = `${this.roomsUrl}/leave`;
+        this.createRoomUrl = `${this.roomsUrl}/create`;
 
         this.usersUrl = `${this.serverUrl}/users`;
         this.updateProfileUrl = `${this.serverUrl}/users/updateProfile`;
@@ -66,6 +67,29 @@ class OktaClient {
         const user = await response.json();
 
         return user;
+    }
+
+    async createRoom(state) {
+        let response;
+        try {
+            response = await fetch(this.createRoomUrl, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.accessToken}`
+                },
+                body: JSON.stringify(state)
+            });
+        } catch (err) {
+            return {err};
+        }
+
+        if (response.status !== 200) {
+            return {err: 'Error creating room'};
+        }
+
+        return {};
     }
 
     async joinRoom(roomId) {

@@ -92,13 +92,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-
   welcomeText: {
     color: "white",
     fontSize: 30,
     marginBottom: 40,
   },
-
   inputView: {
     width: "80%",
     backgroundColor: "grey",
@@ -108,22 +106,18 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 20,
   },
-
   inputText: {
     color: "white",
     height: 50,
   },
-
   forgot: {
     color: "white",
     fontSize: 11,
   },
-
   loginText: {
     color: "white",
     fontSize: 14,
   },
-
   loginBtn: {
     width: "80%",
     backgroundColor: "#5102A1",

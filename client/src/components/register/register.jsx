@@ -2,11 +2,12 @@ import React, { Component } from 'react';
 import { OktaAuth } from '@okta/okta-auth-js';
 import { withOktaAuth } from '@okta/okta-react';
 import { Paper, Button, Typography, Input, InputLabel, FormControl, FormHelperText, Container } from '@material-ui/core';
+import { MuiThemeProvider, CssBaseline } from '@material-ui/core';
 
 class Register extends Component {
   constructor(props) {
     super(props);
-    
+
     this.state = {
       nickName: '',
       email: '',
@@ -80,7 +81,7 @@ class Register extends Component {
         error: 'Error registering'
       });
     }
-    
+
     response = await this.oktaAuth.signIn({
       username: this.state.email,
       password: this.state.password
@@ -95,7 +96,19 @@ class Register extends Component {
   }
 
   render() {
+
+    // Controls the theme of the page itself behind all elements
+    const pageTheme = createMuiTheme({
+      palette: {
+        background: {
+          default: "#303030" // darker grey color for background
+        }
+      }
+    });
+
     return (
+      <MuiThemeProvider theme={pageTheme}>
+      <CssBaseline />
       <Container maxWidth="sm" style={{marginTop: '5rem'}}>
         <Paper style={{padding: '2rem', textAlign: 'center'}}>
           <Typography>Register</Typography>
@@ -137,6 +150,7 @@ class Register extends Component {
           </form>
         </Paper>
       </Container>
+      </MuiThemeProvider>
     );
   }
 }

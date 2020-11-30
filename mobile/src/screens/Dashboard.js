@@ -59,6 +59,16 @@ class Dashboard extends React.Component {
     await this.updateRooms();
   }
 
+  async handleRemoveRoom(roomId) {
+    const ownerId = this.state.rooms.filter(e => e._id === roomId)[0].ownerId;
+    const response = await this.oktaClient.removeRoom(roomId, ownerId);
+    if (response.err) {
+      return console.log(response.err);
+    }
+
+    await this.updateInfo();
+  }
+
   handleToChat(roomId) {
     let data = {
       accessToken: this.state.accessToken,
@@ -131,6 +141,12 @@ class Dashboard extends React.Component {
               <Button
                 title='Open'
                 onPress={() => this.handleToChat(room._id)}
+                color="#5102A1"
+              />
+
+              <Button
+                title='Remove'
+                onPress={async () => await this.handleRemoveRoom(room._id)}
                 color="#5102A1"
               />
             </Card> 

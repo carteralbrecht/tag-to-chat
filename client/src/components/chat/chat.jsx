@@ -129,27 +129,6 @@ class Chat extends Component {
   render() {
     return (
       <div>
-        <Grid container spacing={5} justify="center" style={{marginTop: '5rem'}}>
-          <Grid item xs={2}>
-            <Paper>
-              <Grid container spacing={5} justify="center" align="center">
-                {this.state.rooms.map((room) => (
-                    <Grid item xs={12}>
-                      <Typography>{room.name}</Typography>
-                      <Button 
-                        variant="contained"
-                        color="primary"
-                        type="button"
-                        onClick={() => this.handleJoinRoom(room._id)}
-                        >
-                        Join Room
-                      </Button>
-                    </Grid>
-                ))}
-              </Grid>
-            </Paper>
-          </Grid>
-          <Grid item xs={8}>
             <div className="Chat">
               <Paper id="chat" elevation={3}>
                 {this.state.chat.map((el, index) => {
@@ -165,15 +144,7 @@ class Chat extends Component {
                   );
                 })}
               </Paper>
-              <BottomBar
-                content={this.state.content}
-                handleContent={this.handleContent.bind(this)}
-                handleSubmit={this.handleSubmit.bind(this)}
-                nickname={this.state.nickname}
-              />
             </div>
-          </Grid>
-        </Grid>
       </div>
     );
   }

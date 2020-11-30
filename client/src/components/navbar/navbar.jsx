@@ -34,7 +34,7 @@ const Navbar = () => {
             <Toolbar>
                 <Typography variant="h6" className={classes.title}>
                   <Link color="inherit" underline="none" href="/">
-                  Chat App
+                  tagToChat
                   </Link>
                 </Typography>
                 {authState.isAuthenticated && <Button color="inherit" id="dashboard-button" as="a" href="/dashboard">Dashboard</Button>}

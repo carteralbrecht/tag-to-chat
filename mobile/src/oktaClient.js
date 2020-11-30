@@ -11,6 +11,8 @@ class OktaClient {
         this.joinRoomUrl = `${this.roomsUrl}/join`;
         this.leaveRoomUrl = `${this.roomsUrl}/leave`;
         this.createRoomUrl = `${this.roomsUrl}/create`;
+        this.removeRoomUrl = `${this.roomsUrl}/remove`;
+        this.deleteRoomUrl = `${this.roomsUrl}/delete`;
 
         this.usersUrl = `${this.serverUrl}/users`;
         this.updateProfileUrl = `${this.serverUrl}/users/updateProfile`;
@@ -64,9 +66,54 @@ class OktaClient {
         if (response.status !== 200) {
             return {err: 'Error getting user'};
         }
-        const user = await response.json();
+        const {user} = await response.json();
+        this.userId = user.id;
 
-        return user;
+        return {user};
+    }
+
+    async deleteRoom(roomId) {
+        let response;
+        try {
+            response = await fetch(`${this.deleteRoomUrl}/${roomId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${this.accessToken}`
+                }
+            });
+        } catch (err) {
+            return {err};
+        }
+
+        if (response.status !== 204) {
+            return {err: 'Error deleting room'};
+        }
+
+        return {};
+    }
+
+    async removeRoom(roomId, ownerId) {
+        if (ownerId === this.userId) return await this.deleteRoom(roomId);
+
+        let response;
+        try {
+            response = await fetch(`${this.removeRoomUrl}/${roomId}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${this.accessToken}`
+                }
+            });
+        } catch (err) {
+            return {err};
+        }
+
+        if (response.status !== 200) {
+            return {err: 'Error removing from room'};
+        }
+
+        return {};
     }
 
     async createRoom(state) {

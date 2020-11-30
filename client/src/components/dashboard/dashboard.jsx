@@ -506,12 +506,6 @@ class Dashboard extends Component {
                   );
                 })}
               </Paper>
-              <BottomBar
-                content={this.state.content}
-                handleContent={this.handleContent.bind(this)}
-                handleSubmit={this.handleSubmit.bind(this)}
-                nickname={this.state.nickname}
-              />
             </div>
           </Grid>
         </Grid>
@@ -664,6 +658,12 @@ class Dashboard extends Component {
           onClose={this.handleChatClose}
           TransitionComponent={Transition}
         >
+          <BottomBar
+              content={this.state.content}
+              handleContent={this.handleContent.bind(this)}
+              handleSubmit={this.handleSubmit.bind(this)}
+              nickname={this.state.nickname}
+          />
           <AppBar className={classes.appBar}>
             <Toolbar>
               <IconButton edge="end" color="inherit" onClick={this.handleChatClose}>

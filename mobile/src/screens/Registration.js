@@ -15,8 +15,7 @@ class Reg extends React.Component {
     this.state = {
       nickName: "",
       email: "",
-      password: "",
-      confirmPassword: "",
+      statusText: ""
     };
 
     this.client = new Client(process.env.SERVER_URL);
@@ -41,7 +40,7 @@ class Reg extends React.Component {
       return console.log('Unknown error');
     }
 
-    this.props.navigation.navigate("Login");
+    this.setState({statusText: "Please check your email for a link to set your password."});
   }
 
   validate() {
@@ -57,25 +56,6 @@ class Reg extends React.Component {
       alert("Please enter your email address.");
     }
 
-    if (this.state.password == "") {
-      isValid = false;
-      alert("Please enter a password.");
-    }
-
-    if (this.state.confirmPassword == "") {
-      isValid = false;
-      alert("Please confirm your password.");
-    }
-
-    if (
-      this.state.password !== "undefined" &&
-      this.state.confirmPassword !== "undefined"
-    ) {
-      if (this.state.password != this.state.confirmPassword) {
-        isValid = false;
-        alert("Passwords do not match");
-      }
-    }
     return isValid;
   }
 
@@ -110,44 +90,12 @@ class Reg extends React.Component {
             id="email"
           />
         </View>
-
-        <View style={styles.inputView}>
-          <TextInput
-            type="password"
-            style={styles.inputText}
-            label="password"
-            name="password"
-            secureTextEntry
-            onChangeText={(text) => this.setState({ password: text })}
-            placeholder="Enter password"
-            placeholderTextColor="white"
-            enablesReturnKeyAutomatically
-            keyboardAppearance="dark"
-            keyboardType="email-address"
-            id="password"
-          />
-        </View>
-
-        <View style={styles.inputView}>
-          <TextInput
-            type="password"
-            style={styles.inputText}
-            label="Confirm Password"
-            name="confirmPassword"
-            secureTextEntry
-            onChangeText={(text) => this.setState({ confirmPassword: text })}
-            placeholder="Confirm password"
-            placeholderTextColor="white"
-            enablesReturnKeyAutomatically
-            keyboardAppearance="dark"
-            id="confirmPassword"
-          />
-        </View>
+        <Text style={{color: "white"}}>{this.state.statusText}</Text>
         <TouchableOpacity
           style={styles.registerBtn}
           onPress={this.handleSubmit}
         >
-          <Text style={styles.registerText}>Register!</Text>
+          <Text style={styles.registerText}>Register</Text>
         </TouchableOpacity>
       </View>
     );
@@ -190,7 +138,7 @@ const styles = StyleSheet.create({
         height: 50,
         justifyContent: "center",
         alignItems: "center",
-        marginTop: 40,
+        marginTop: 20,
         marginBottom: 10
     }
 })

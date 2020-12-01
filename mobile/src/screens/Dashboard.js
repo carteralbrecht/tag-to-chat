@@ -8,6 +8,7 @@ import {
   ScrollView,
   View,
   Button,
+  Alert
 } from "react-native";
 import { Card, Icon } from "react-native-elements";
 import Client from "../client.js";
@@ -87,12 +88,13 @@ class Dashboard extends React.Component {
     this.setState({ screenHeight: contentHeight });
   };
 
-  deleteConfirmation() {
+  deleteConfirmation(roomId) {
     Alert.alert(
-      'Remove Chat?',
+      'Are you sure?',
+      'Removing a room is permanent.',
       [
         {text: 'NO', onPress: () => console.warn('delete room cancelled'), style: 'cancel'},
-        {text: 'YES', onPress: async () => await this.handleRemoveRoom(room._id)},
+        {text: 'YES', onPress: async () => await this.handleRemoveRoom(roomId)},
       ]
     );
   };
@@ -156,7 +158,7 @@ class Dashboard extends React.Component {
               <Button
                 title='Remove'
                 color="#5102A1"
-                onPress={this.deleteConfirmation}
+                onPress={() => this.deleteConfirmation(room._id)}
               />
             </Card> 
           ))}

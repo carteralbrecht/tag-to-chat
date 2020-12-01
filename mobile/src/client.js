@@ -302,7 +302,6 @@ class Client {
 
     async register(state) {
         const email = state.email;
-        const password = state.password;
         const nickName = state.nickName;
 
         let response;
@@ -315,7 +314,6 @@ class Client {
                 },
                 body: JSON.stringify({
                     email,
-                    password,
                     nickName
                 })
             });
@@ -328,7 +326,7 @@ class Client {
         }
         const user = await response.json();
 
-        return user;
+        return {user};
     }
 
     async signIn(state) {

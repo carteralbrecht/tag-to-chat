@@ -89,6 +89,16 @@ class Dashboard extends React.Component {
     this.setState({ screenHeight: contentHeight });
   };
 
+  deleteConfirmation() {
+    Alert.alert(
+      'Remove Chat?',
+      [
+        {text: 'NO', onPress: () => console.warn('delete room cancelled'), style: 'cancel'},
+        {text: 'YES', onPress: async () => await this.handleRemoveRoom(room._id)},
+      ]
+    );
+  };
+
   render() {
     const statusbar = (Platform.OS == 'ios') ? <View style={styles.statusbar}></View> : <View></View>;
     return (
@@ -129,7 +139,7 @@ class Dashboard extends React.Component {
           />
         </View>
             <Header2 title="Chat List:"/>
-
+{/*}
         <ScrollView style={ styles.cardContainer }>
           {this.state.rooms.map((room) => (
             <Card key={room._id} containerStyle={{ borderRadius: 10 }}>
@@ -146,12 +156,13 @@ class Dashboard extends React.Component {
 
               <Button
                 title='Remove'
-                onPress={async () => await this.handleRemoveRoom(room._id)}
                 color="#5102A1"
+                onPress={this.deleteConfirmation}
               />
             </Card> 
           ))}
         </ScrollView>
+          */}
     </View> 
     );
   }

@@ -9,8 +9,8 @@ class SignIn extends Component {
       return <div>Loading...</div>;
     }
 
-    return this.props.authState.isAuthenticated ? 
-      <Redirect to={{ pathname: '/chat' }} /> : 
+    return this.props.authState.isAuthenticated ?
+      <Redirect to={{ pathname: '/dashboard' }} /> : 
       <SignInForm issuer={this.props.issuer} />;
 
   }

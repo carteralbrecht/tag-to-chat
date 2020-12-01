@@ -17,7 +17,7 @@ class AppRouter extends Component {
   onAuthRequired() {
     this.props.history.push('/login');
   }
-  
+
   render() {
     return (
         <Security issuer='https://dev-1701617.okta.com/oauth2/default'
@@ -26,7 +26,6 @@ class AppRouter extends Component {
                 onAuthRequired={this.onAuthRequired}
                 pkce={true} >
             <Navbar />      
-            <Route path="/" exact component={Home} />
             <Route path="/login/callback" component={LoginCallback} />
             <Route path='/login' render={() => <SignIn issuer='https://dev-1701617.okta.com/oauth2/default' />} />
             <Route path='/register' render={() => <Register issuer='https://dev-1701617.okta.com/oauth2/default' />} />

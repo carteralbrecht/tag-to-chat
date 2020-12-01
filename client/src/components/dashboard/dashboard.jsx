@@ -411,6 +411,7 @@ class Dashboard extends Component {
                         variant = "contained"
                         style={{backgroundColor: "#E83F1B", color: "white"}}
                         type="button"
+                        onClick={this.state.handleDeleteVerification}
                         >
                         Leave
                       </Button>

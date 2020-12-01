@@ -16,7 +16,7 @@ class MessageScreen extends React.Component {
     const params = this.props.route.params;
     this.state = {
       accessToken: params.accessToken,
-      activeRoom: params.activeRoom,
+      room: params.room,
       userId: params.userId,
       nickName: params.nickName,
       name: '',
@@ -38,9 +38,9 @@ class MessageScreen extends React.Component {
       // Socket stuff
       this.socket = io(process.env.SERVER_URL);
 
-      this.socket.on('connect', () => {
-        if (this.state.activeRoom) {
-          this.handleJoinRoom(this.state.activeRoom);
+      this.socket.on('connect', async () => {
+        if (this.state.room) {
+          await this.handleJoinRoom(this.state.room);
         } else {
           this.props.navigation.navigate('Login');
         }
@@ -61,7 +61,6 @@ class MessageScreen extends React.Component {
 
     this.props.navigation.addListener('blur', async () => {
       if (this.state.activeRoom) {
-        this.setState({chat: []});
         this.socket.disconnect();
         await this.handleLeaveRoom(this.state.activeRoom);
       }
@@ -70,36 +69,34 @@ class MessageScreen extends React.Component {
 
   // Call this when the user wants to go back to dashboard
   async handleLeaveRoom() {
-    const activeRoom = this.state.activeRoom;
-    if (!activeRoom) {
+    const room = this.state.room;
+    if (!room) {
       return this.props.navigation.navigate('Login');
     }
 
-    console.log('leaving ', activeRoom);
+    console.log('leaving ', room._id);
 
     const accessToken = this.client.getAccessToken();
-    const response = await this.client.leaveRoom(activeRoom);
+    const response = await this.client.leaveRoom(room._id);
     if (response.err) {
       return console.log(response.err);
     }
 
     this.socket.emit('leaveRoom', accessToken);
 
-    this.setState({ activeRoom: '', chat: []});
+    this.setState({ room: {}, chat: []});
 
     console.log('Leave room successful');
 
     this.props.navigation.navigate('Dashboard');
   }
 
-  async handleJoinRoom(roomId) {
+  async handleJoinRoom(room) {
     const accessToken = this.client.getAccessToken();
-    const response = await this.client.joinRoom(roomId);
+    const response = await this.client.joinRoom(room._id);
     if (response.err) {
       return console.log(response.err);
     }
-
-    const room = response;
 
     this.socket.emit('joinRoom', accessToken);
 
@@ -128,7 +125,7 @@ class MessageScreen extends React.Component {
           <Button
             title="Back"
             color="#fff"
-            onPress={() => this.handleLeaveRoom() }
+            onPress={async () => await this.handleLeaveRoom() }
           />
           <Header title={this.state.name}/>
           <Button

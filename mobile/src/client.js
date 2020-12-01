@@ -251,8 +251,7 @@ class Client {
             return {err: 'Error joining room'};
         }
 
-        const room = await response.json();
-        return room;
+        return {};
     }
 
     async leaveRoom(roomId) {
@@ -273,8 +272,7 @@ class Client {
             return {err: 'Error leaving room'};
         }
 
-        const room = await response.json();
-        return room;
+        return {};
     }
 
     async getRooms() {
@@ -302,7 +300,6 @@ class Client {
 
     async register(state) {
         const email = state.email;
-        const password = state.password;
         const nickName = state.nickName;
 
         let response;
@@ -315,7 +312,6 @@ class Client {
                 },
                 body: JSON.stringify({
                     email,
-                    password,
                     nickName
                 })
             });
@@ -328,7 +324,7 @@ class Client {
         }
         const user = await response.json();
 
-        return user;
+        return {user};
     }
 
     async signIn(state) {

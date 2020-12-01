@@ -11,7 +11,7 @@ router.post('/access', async (req, res) => {
 
     const sessionToken = req.body.sessionToken;
 
-    const qs = `client_id=${clientId}&sessionToken=${sessionToken}&response_type=token&scope=openid&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Flogin%2Fcallback&nonce=testNonce&state=testState`;
+    const qs = `client_id=${clientId}&sessionToken=${sessionToken}&response_type=token&scope=openid&redirect_uri=https%3A%2F%2Fcop4331-chatapp.herokuapp.com%2Flogin%2Fcallback&nonce=testNonce&state=testState`;
         
     const url = `https://${oktaDomain}/oauth2/default/v1/authorize?${qs}`;
     let response;

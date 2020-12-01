@@ -102,16 +102,11 @@ router.put('/create', async (req, res) => {
       email: req.body.email,
       login: req.body.email,
       nickName: req.body.nickName,
-    },
-    credentials: {
-      password: {
-        value: req.body.password,
-      },
-    },
+    }
   };
   let user;
   try {
-    user = await oktaClient.createUser(newUser);
+    user = await oktaClient.createUser(newUser, {activate: "true"});
   } catch (err) {
     return res.status(500).send(err);
   }

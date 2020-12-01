@@ -27,9 +27,11 @@ import SearchIcon from "@material-ui/icons/Search";
 import SearchBar from "material-ui-search-bar";
 import AddIcon from "@material-ui/icons/Add";
 import {withOktaAuth} from '@okta/okta-react';
-import BottomBar from '../chat/bottomBar';
+import BottomBar from '../chat/bottomBar.jsx';
 import './dashboard.css';
 import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Chat from "../chat/chat";
+import Card from "@material-ui/core/Card";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="down" ref={ref} {...props} />;
@@ -100,7 +102,8 @@ const useStyles = theme => ({
   newChatButton: {
     color: "white",
     marginTop: theme.spacing(-12),
-    marginLeft: theme.spacing(140)
+    marginLeft: theme.spacing(140),
+    float: "right",
   }
 });
 
@@ -219,9 +222,6 @@ class Dashboard extends Component {
         chat: [...state.chat, msg],
       }), this.scrollToBottom);
     });
-
-    // Automatically join first room user is added to
-    if (this.state.rooms.length > 0) this.handleJoinRoom(this.state.rooms[0]._id);
   }
 
   async handleLeaveRoom(roomId) {
@@ -263,6 +263,7 @@ class Dashboard extends Component {
   }
 
   async handleJoinRoom(roomId) {
+
     // Leave old room before joining new
     if (this.state.activeRoom) {
       await this.handleLeaveRoom(roomId);
@@ -290,6 +291,8 @@ class Dashboard extends Component {
     this.setState((state) => ({
       chat: [...state.chat, ...messages],
     }), this.scrollToBottom);
+
+    this.handleChatOpen()
   }
 
   async handleAddRoom(roomId) {
@@ -437,64 +440,38 @@ class Dashboard extends Component {
             >
               <SearchIcon display="inline" style={{ fontSize: '4rem' }} />
             </IconButton>
-
             <IconButton
                 className={classes.newChatButton}
                 onClick={this.handleCreateRoomOpen}
+                justify="flex-end"
             >
-            <AddIcon display="indline" style={{fontSize: '4rem'}} />
+            <AddIcon display="inline" style={{fontSize: '4rem'}} />
             </IconButton>
           </Grid>
-          <Grid item xs={2}>
-            <Paper>
               <Grid container spacing={5} justify="center" align="center">
                 {this.state.rooms.map((room) => (
-                    <Grid item xs={12}>
-                      <Typography>{room.name}</Typography>
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        type="button"
-                        onClick={() => this.handleJoinRoom(room._id)}
-                        >
-                        Join
-                      </Button>
-                      <Button
-                        variant = "contained"
-                        style={{backgroundColor: "#E83F1B", color: "white"}}
-                        type="button"
-                        >
-                        Leave
-                      </Button>
+                    <Grid item xs={6} sm={3}>
+                        <Paper>
+                          <Typography>{room.name}</Typography>
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            type="button"
+                            onClick={() => this.handleJoinRoom(room._id)}
+                            >
+                            Join
+                          </Button>
+                          <Button
+                            variant = "contained"
+                            style={{backgroundColor: "#E83F1B", color: "white"}}
+                            type="button"
+                            >
+                            Remove
+                          </Button>
+                      </Paper>
                     </Grid>
                 ))}
               </Grid>
-            </Paper>
-          </Grid>
-          <Grid item xs={9} style={{height: "100%"}}>
-            <div id="chat" className="Chat">
-              <Paper elevation={3}>
-                {this.state.chat.map((el, index) => {
-                  return (
-                    <div key={index}>
-                      <Typography variant="caption" className="name">
-                        {el.name}
-                      </Typography>
-                      <Typography variant="body1" className="content">
-                        {el.content}
-                      </Typography>
-                    </div>
-                  );
-                })}
-              </Paper>
-              <BottomBar
-                content={this.state.content}
-                handleContent={this.handleContent.bind(this)}
-                handleSubmit={this.handleSubmit.bind(this)}
-                nickname={this.state.nickname}
-              />
-            </div>
-          </Grid>
         </Grid>
 
         <Dialog open={this.state.profileOpen} onClose={this.handleProfileClose} aria-labelledby="form-dialog-title">
@@ -652,6 +629,13 @@ class Dashboard extends Component {
               </IconButton>
             </Toolbar>
           </AppBar>
+          <Chat/>
+          <BottomBar
+              content={this.state.content}
+              handleContent={this.handleContent.bind(this)}
+              handleSubmit={this.handleSubmit.bind(this)}
+              nickname={this.state.nickname}
+          />
         </Dialog>
       </MuiThemeProvider>
     );

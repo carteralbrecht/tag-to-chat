@@ -3,7 +3,8 @@ import { OktaAuth } from '@okta/okta-auth-js';
 import { withOktaAuth } from '@okta/okta-react';
 import { Paper, Button, Typography, Input, InputLabel, FormControl, Container, TextField } from '@material-ui/core';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
-
+import { MuiThemeProvider, CssBaseline } from '@material-ui/core';
+import createMuiTheme from "@material-ui/core/styles/createMuiTheme";
 class SignInForm extends Component {
   constructor(props) {
     super(props);
@@ -83,7 +84,19 @@ class SignInForm extends Component {
       return null;
     }
 
+
+    // Controls the theme of the page itself behind all elements
+    const pageTheme = createMuiTheme({
+      palette: {
+        background: {
+          default: "#303030" // darker grey color for background
+        }
+      }
+    });
+
     return (
+      <MuiThemeProvider theme={pageTheme}>
+      <CssBaseline />
       <Container maxWidth="sm" style={{marginTop: '5rem'}}>
         <Paper style={{padding: '2rem', textAlign: 'center'}}>
           <Typography>Login</Typography>
@@ -140,6 +153,7 @@ class SignInForm extends Component {
           </Dialog>
         </Paper>
       </Container>
+      </MuiThemeProvider>
     );
   }
 };

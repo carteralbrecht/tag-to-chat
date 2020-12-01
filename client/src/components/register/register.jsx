@@ -1,21 +1,20 @@
 import React, { Component } from 'react';
 import { OktaAuth } from '@okta/okta-auth-js';
-import { withOktaAuth } from '@okta/okta-react';
+import { withRouter } from 'react-router-dom';
 import { Paper, Button, Typography, Input, InputLabel, FormControl, FormHelperText, Container } from '@material-ui/core';
+import { MuiThemeProvider, CssBaseline } from '@material-ui/core';
+import createMuiTheme from "@material-ui/core/styles/createMuiTheme";
 
 class Register extends Component {
   constructor(props) {
     super(props);
-    
+
     this.state = {
       nickName: '',
       email: '',
-      password: '',
-      passwordDup: '',
       sessionToken: null,
-      error: '',
-      dupError: '',
-      passwordError: ''
+      message: '',
+      dupError: ''
     };
 
     this.oktaAuth = new OktaAuth({
@@ -25,8 +24,6 @@ class Register extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleNickNameChange = this.handleNickNameChange.bind(this);
     this.handleEmailChange = this.handleEmailChange.bind(this);
-    this.handlePasswordChange = this.handlePasswordChange.bind(this);
-    this.handlePasswordDupChange = this.handlePasswordDupChange.bind(this);
   }
 
   handleNickNameChange(e) {
@@ -35,33 +32,13 @@ class Register extends Component {
   handleEmailChange(e) {
     this.setState({ email: e.target.value });
   }
-  handlePasswordChange(e) {
-    this.setState({ password: e.target.value });
-  }
-  handlePasswordDupChange(e) {
-    this.setState({ passwordDup: e.target.value });
-  }
 
   async handleSubmit(e) {
     e.preventDefault();
 
     this.setState({
       error: '',
-      passwordError: '',
-      dupError: ''
     });
-
-    if (this.state.password.length < 8) {
-      return this.setState({
-        passwordError: 'Password must be at least 8 characters'
-      });
-    }
-
-    if (this.state.password !== this.state.passwordDup) {
-      return this.setState({
-        dupError: 'Password and Confirm Password must be the same'
-      });
-    }
 
     let response = await fetch('/api/users/create', {
       method: 'PUT',
@@ -75,30 +52,31 @@ class Register extends Component {
     let body = await response.json();
 
     if (response.status !== 201) {
-      console.log(body);
       return this.setState({
-        error: 'Error registering'
+        message: 'Error registering'
       });
     }
-    
-    response = await this.oktaAuth.signIn({
-      username: this.state.email,
-      password: this.state.password
-    });
 
-    const sessionToken = response.data.sessionToken;
-    this.setState({
-      sessionToken
-    });
-
-    this.props.authService.redirect({sessionToken});
+    this.props.history.push('/login');
   }
 
   render() {
+
+    // Controls the theme of the page itself behind all elements
+    const pageTheme = createMuiTheme({
+      palette: {
+        background: {
+          default: "#303030" // darker grey color for background
+        }
+      }
+    });
+
     return (
+      <MuiThemeProvider theme={pageTheme}>
+      <CssBaseline />
       <Container maxWidth="sm" style={{marginTop: '5rem'}}>
         <Paper style={{padding: '2rem', textAlign: 'center'}}>
-          <Typography>Register</Typography>
+          <Typography>Create Account</Typography>
           <form onSubmit={this.handleSubmit}>
             <div>
               <FormControl style={{width: '100%'}}>
@@ -113,32 +91,19 @@ class Register extends Component {
               </FormControl>
             </div>
             <div>
-              <FormControl style={{width: '100%'}}>
-                <InputLabel htmlFor="password">Password</InputLabel>
-                <Input id="password" type="password" value={this.state.password} onChange={this.handlePasswordChange}/>
-              </FormControl>
-              <FormHelperText>{this.state.passwordError}</FormHelperText>
-            </div>
-            <div>
-              <FormControl style={{width: '100%'}}>
-                <InputLabel htmlFor="passwordDup">Confirm Password</InputLabel>
-                <Input id="passwordDup" type="password" value={this.state.passwordDup} onChange={this.handlePasswordDupChange}/>
-              </FormControl>
-              <FormHelperText>{this.state.dupError}</FormHelperText>
-            </div>
-            <div>
-              <Typography style={{marginTop: '1rem'}}>{this.state.error}</Typography>
+              <Typography style={{marginTop: '1rem'}}>{this.state.message}</Typography>
             </div>
             <div style={{marginTop: '1rem'}}>
               <Button variant="contained" color="primary" type="submit">
-                Register
+                Get Verification Email
               </Button>
             </div>
           </form>
         </Paper>
       </Container>
+      </MuiThemeProvider>
     );
   }
 }
 
-export default withOktaAuth(Register);
+export default withRouter(Register);

@@ -4,6 +4,7 @@ import { withOktaAuth } from '@okta/okta-react';
 import { Paper, Button, Typography, Input, InputLabel, FormControl, Container, TextField } from '@material-ui/core';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
 import { MuiThemeProvider, CssBaseline } from '@material-ui/core';
+import createMuiTheme from "@material-ui/core/styles/createMuiTheme";
 class SignInForm extends Component {
   constructor(props) {
     super(props);

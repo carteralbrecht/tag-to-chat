@@ -5,26 +5,18 @@ import Header2 from "../components/Header2";
 import {
   StyleSheet,
   Text,
-  TextInput,
-  TouchableOpacity,
-  Image,
   ScrollView,
   View,
   Button,
-  Alert,
-  Modal,
-  TouchableHighlight,
-  TouchableHighlightBase
 } from "react-native";
-import { Card, ListItem, Icon } from "react-native-elements";
-import OktaClient from '../oktaClient.js';
+import { Card, Icon } from "react-native-elements";
+import OktaClient from "../oktaClient.js";
 
 class Dashboard extends React.Component {
   constructor(props) {
     super(props);
-    const params = this.props.route.params;
     this.state = {
-      accessToken: params.accessToken,
+      accessToken: this.props.route.params.accessToken,
       email: "",
       password: "",
       rooms: []
@@ -40,14 +32,16 @@ class Dashboard extends React.Component {
     }
   }
 
+
+
   async checkUser() {
     const response = await this.oktaClient.getUser();
     if (response.err) {
       return console.log(response.err);
     }
 
-    const userInfo = response.user;
-    this.setState({ userInfo });
+    const {profile, id: userId} = response.user;
+    this.setState({ profile, userId });
   }
 
   async updateRooms() {
@@ -59,10 +53,27 @@ class Dashboard extends React.Component {
     this.setState({ rooms: response.rooms ? response.rooms : [] });
   }
 
+  async updateInfo() {
+    console.log('updating info');
+    await this.checkUser();
+    await this.updateRooms();
+  }
+
+  async handleRemoveRoom(roomId) {
+    const ownerId = this.state.rooms.filter(e => e._id === roomId)[0].ownerId;
+    const response = await this.oktaClient.removeRoom(roomId, ownerId);
+    if (response.err) {
+      return console.log(response.err);
+    }
+
+    await this.updateInfo();
+  }
+
   handleToChat(roomId) {
     let data = {
       accessToken: this.state.accessToken,
-      nickName: this.state.userInfo.profile.nickName,
+      userId: this.state.userId,
+      nickName: this.state.profile.nickName,
       activeRoom: roomId
     }
 
@@ -70,8 +81,8 @@ class Dashboard extends React.Component {
   }
 
   async componentDidMount() {
-    await this.checkUser();
-    await this.updateRooms();
+    await this.updateInfo();
+    this.props.navigation.addListener('focus', async () => await this.updateInfo());;
   }
 
   onContentSizeChange = (contentWidth, contentHeight) => {
@@ -87,9 +98,11 @@ class Dashboard extends React.Component {
           <Icon
             name='add'
             size={30}
-            color='#fff'
-            title="Search"
-            onPress={() => this.props.navigation.navigate("AddRoom") }
+            color="#fff" 
+            title="Profile"
+            onPress={() => this.props.navigation.navigate("Create", {
+              accessToken: this.state.accessToken
+            })}
           />
           <Icon
             name='search'
@@ -104,7 +117,10 @@ class Dashboard extends React.Component {
             size={30}
             color="#fff" 
             title="Profile"
-            onPress={() => this.props.navigation.navigate("Profile") }
+            onPress={() => this.props.navigation.navigate("Profile", {
+              accessToken: this.state.accessToken,
+              profile: this.state.profile
+            })}
           />
           <Button
             title="Log Out"
@@ -125,6 +141,12 @@ class Dashboard extends React.Component {
               <Button
                 title='Open'
                 onPress={() => this.handleToChat(room._id)}
+                color="#5102A1"
+              />
+
+              <Button
+                title='Remove'
+                onPress={async () => await this.handleRemoveRoom(room._id)}
                 color="#5102A1"
               />
             </Card> 

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { withOktaAuth } from '@okta/okta-react';
 
 import { Container, Paper, Typography, MuiThemeProvider, CssBaseline} from '@material-ui/core';
+import createMuiTheme from "@material-ui/core/styles/createMuiTheme";
 
 class Home extends Component {
 

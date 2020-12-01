@@ -3,6 +3,7 @@ import { OktaAuth } from '@okta/okta-auth-js';
 import { withOktaAuth } from '@okta/okta-react';
 import { Paper, Button, Typography, Input, InputLabel, FormControl, FormHelperText, Container } from '@material-ui/core';
 import { MuiThemeProvider, CssBaseline } from '@material-ui/core';
+import createMuiTheme from "@material-ui/core/styles/createMuiTheme";
 
 class Register extends Component {
   constructor(props) {

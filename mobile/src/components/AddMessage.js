@@ -29,8 +29,8 @@ function AddMessage({ submitHandler }) {
             placeholder="Aa"
             keyboardAppearance="dark"
             multiline={true}
-            clearTextOnFocus={true}
             onChangeText={textChangeHandler}
+            value={text}
             onContentSizeChange={(event) => {
               setHeight(event.nativeEvent.contentSize.height);
             }}
@@ -39,7 +39,10 @@ function AddMessage({ submitHandler }) {
         <Icon
           reverse
           name="send"
-          onPress={() => submitHandler(text)}
+          onPress={() => {
+            submitHandler(text);
+            textChangeHandler('');
+          }}
           color="white"
           reverseColor="#5102A1"
         />

@@ -5,8 +5,7 @@ const got = require('got');
 const authenticateUser = require('../authMiddleware');
 
 router.get('/', authenticateUser, async (req, res) => {
-  const claims = res.locals.claims;
-  const userId = claims.userId;
+  const userId = res.locals.claims.userId;
 
   let user;
   try {
@@ -22,8 +21,7 @@ router.post('/updateProfile', authenticateUser, async (req, res) => {
   if (!req.body) return res.sendStatus(400);
 
   const userInfo = req.body.userInfo;
-  const claims = res.locals.claims;
-  const userId = claims.userId;
+  const userId = res.locals.claims.userId;
 
   let user;
   try {

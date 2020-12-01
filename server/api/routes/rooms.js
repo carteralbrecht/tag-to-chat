@@ -4,19 +4,21 @@ const Room = require('../../models/Room');
 const {v4: uuidv4} = require('uuid');
 const oktaClient = require('../lib/oktaClient');
 const authenticateUser = require('../authMiddleware');
+const {getRoomsAdded, getRoomsOwned, removeRoomAdded, removeRoomOwned} = require('../lib/helpers');
 
 /*
     - Gets all rooms a user is added to
     - Pulls from user authenticaion claims
 */
 router.get('/', authenticateUser, async (req, res) => {
-  const roomsAdded = res.locals.claims.roomsAdded;
+  const userId = res.locals.claims.userId;
+
+  const roomsAdded = await getRoomsAdded(userId);
 
   let rooms;
   try {
     rooms = await Room.find().where('_id').in(roomsAdded).exec();
   } catch (err) {
-    console.log(err);
     return res.status(500).send(err);
   }
 
@@ -28,9 +30,7 @@ router.get('/', authenticateUser, async (req, res) => {
     https://stackoverflow.com/questions/44374267/mongoose-return-document-if-a-search-string-is-in-an-array
 */
 router.post('/tags', authenticateUser, async (req, res) => {
-  if (!req.body) {
-    return res.sendStatus(400);
-  }
+  if (!req.body) return res.sendStatus(400);
 
   const tagsLookingFor = arrayToLower(req.body.tags);
   const conditions = {tags: {$in: tagsLookingFor}};
@@ -52,22 +52,20 @@ router.post('/create', authenticateUser, async (req, res) => {
   if (!req.body) return res.sendStatus(400);
 
   const name = req.body.name;
-  const email = req.body.email;
   const private = req.body.private;
   const tags = req.body.tags;
 
+  const userId = res.locals.claims.userId;
   let user;
   try {
-    user = await oktaClient.getUser(email);
+    user = await oktaClient.getUser(userId);
   } catch (err) {
     return res.status(500).send(err);
   }
 
-  const ownerId = user.id;
-
   const roomToCreate = new Room({
     name,
-    ownerId,
+    ownerId: user.id,
     private,
     joinCode: uuidv4(),
     users: [],
@@ -95,7 +93,6 @@ router.post('/create', authenticateUser, async (req, res) => {
 
   user.profile.roomsOwned.push(roomId);
   user.profile.roomsAdded.push(roomId);
-
   await user.update();
 
   return res.status(200).send(data);
@@ -107,7 +104,9 @@ router.post('/create', authenticateUser, async (req, res) => {
 */
 router.get('/code/:roomId', authenticateUser, async (req, res) => {
   const roomId = req.params.roomId;
-  const roomsOwned = res.locals.claims.roomsOwned;
+  const userId = res.locals.claims.userId;
+
+  const roomsOwned = await getRoomsOwned(userId);
 
   // Check user claims before executing transaction
   if (!roomsOwned || !roomsOwned.includes(roomId)) return res.sendStatus(403);
@@ -127,7 +126,9 @@ router.get('/code/:roomId', authenticateUser, async (req, res) => {
 */
 router.post('/code/:roomId', authenticateUser, async (req, res) => {
   const roomId = req.params.roomId;
-  const roomsOwned = res.locals.claims.roomsOwned;
+  const userId = res.locals.claims.userId;
+
+  const roomsOwned = await getRoomsOwned(userId);
 
   // Check user claims before executing transaction
   if (!roomsOwned || !roomsOwned.includes(roomId)) return res.sendStatus(403);
@@ -151,16 +152,36 @@ router.post('/code/:roomId', authenticateUser, async (req, res) => {
 */
 router.delete('/delete/:roomId', authenticateUser, async (req, res) => {
   const roomId = req.params.roomId;
-  const roomsOwned = res.locals.claims.roomsOwned;
+  const userId = res.locals.claims.userId;
+
+  const roomsOwned = await getRoomsOwned(userId);
 
   // Check user claims before executing transaction
   if (!roomsOwned || !roomsOwned.includes(roomId)) return res.sendStatus(403);
+
+  let room;
+  try {
+    room = await Room.findById(roomId);
+  } catch (err) {
+    return res.status(500).send(err);
+  }
+
+  if (!room) return res.sendStatus(500);
+
+  // Remove all users from room before deleting
+  let users = room.users;
+  for (let i = 0; i < users.length; i++) {
+    let userId = users[i].userId;
+    await removeRoomAdded(userId, roomId);
+  }
 
   try {
     await Room.deleteOne({_id: roomId});
   } catch (err) {
     return res.sendStatus(404);
   }
+
+  await removeRoomOwned(userId, roomId);
 
   return res.sendStatus(204);
 });
@@ -172,9 +193,9 @@ router.delete('/delete/:roomId', authenticateUser, async (req, res) => {
 */
 router.post('/leave/:roomId', authenticateUser, async (req, res) => {
   const roomId = req.params.roomId;
-  const claims = res.locals.claims;
-  const userId = claims.userId;
-  const roomsAdded = claims.roomsAdded;
+  const userId = res.locals.claims.userId;
+
+  const roomsAdded = await getRoomsAdded(userId);
 
   // Check user claims before executing transaction
   if (!roomsAdded || !roomsAdded.includes(roomId)) return res.sendStatus(403);
@@ -193,6 +214,16 @@ router.post('/leave/:roomId', authenticateUser, async (req, res) => {
     return res.status(500).send(err);
   }
 
+  let user;
+  try {
+    user = await oktaClient.getUser(userId);
+  } catch (err) {
+    return res.status(500).send(err);
+  }
+
+  user.profile.roomActive = '';
+  await user.update();
+
   return res.status(200).send(room);
 });
 
@@ -203,9 +234,9 @@ router.post('/leave/:roomId', authenticateUser, async (req, res) => {
 */
 router.post('/join/:roomId', authenticateUser, async (req, res) => {
   const roomId = req.params.roomId;
-  const claims = res.locals.claims;
-  const userId = claims.userId;
-  const roomsAdded = claims.roomsAdded;
+  const userId = res.locals.claims.userId;
+
+  const roomsAdded = await getRoomsAdded(userId);
 
   // Check user claims before executing transaction
   if (!roomsAdded || !roomsAdded.includes(roomId)) return res.sendStatus(403);
@@ -221,8 +252,18 @@ router.post('/join/:roomId', authenticateUser, async (req, res) => {
   try {
     room = await Room.findOneAndUpdate(conditions, update, {new: true});
   } catch (err) {
-    res.status(500).send(err);
+    return res.status(500).send(err);
   }
+
+  let user;
+  try {
+    user = await oktaClient.getUser(userId);
+  } catch (err) {
+    return res.status(500).send(err);
+  }
+
+  user.profile.roomActive = roomId;
+  await user.update();
 
   return res.status(200).send(room);
 });
@@ -235,8 +276,7 @@ router.post('/add/:roomId', authenticateUser, async (req, res) => {
   if (!req.body) return res.sendStatus(400);
 
   const roomId = req.params.roomId;
-  const claims = res.locals.claims;
-  const userId = claims.userId;
+  const userId = res.locals.claims.userId;
   const joinCode = req.body.joinCode;
 
   const conditions = {
@@ -256,7 +296,6 @@ router.post('/add/:roomId', authenticateUser, async (req, res) => {
     return res.status(500).send(err);
   }
 
-  // Removes roomsAdded claim from user
   let user;
   try {
     user = await oktaClient.getUser(userId);
@@ -274,16 +313,16 @@ router.post('/add/:roomId', authenticateUser, async (req, res) => {
 
 /*
     - Removes user from room
-    - Called by room owner
+    - Called by room member
 */
 router.post('/remove/:roomId', authenticateUser, async (req, res) => {
   const roomId = req.params.roomId;
-  const claims = res.locals.claims;
-  const userId = claims.userId;
-  const roomsOwned = claims.roomsOwned;
+  const userId = res.locals.claims.userId;
+
+  const roomsAdded = await getRoomsAdded(userId, roomId);
 
   // Check user claims before executing transaction
-  if (!roomsOwned || !roomsOwned.includes(roomId)) return res.sendStatus(403);
+  if (!roomsAdded || !roomsAdded.includes(roomId)) return res.sendStatus(403);
 
   const conditions = {
     '_id': roomId,
@@ -301,18 +340,18 @@ router.post('/remove/:roomId', authenticateUser, async (req, res) => {
     return res.status(500).send(err);
   }
 
-  // Removes roomsAdded claim from user
-  let user;
-  try {
-    user = await oktaClient.getUser(userId);
-  } catch (err) {
-    return res.status(500).send(err);
+  // Delete room if users empty
+  if (room.users.length === 0) {
+    try {
+      await Room.deleteOne({_id: roomId});
+    } catch (err) {
+      return res.sendStatus(404);
+    }
   }
 
-  delete user.profile.roomsAdded[roomId];
-  await user.update();
+  await removeRoomAdded(userId, roomId);
 
-  return res.status(200).send(room);
+  return res.sendStatus(200);
 });
 
 arrayToLower = (array) => {

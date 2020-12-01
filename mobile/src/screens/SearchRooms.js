@@ -41,6 +41,15 @@ class SearchRooms extends React.Component {
                     placeholderTextColor="white" 
                     id="roomTag" />
             </View>
+            <TouchableOpacity 
+                style={styles.registerBtn}
+                onPress={this.handleSubmit} >
+                <Text 
+                    style={styles.registerText}>Search
+                </Text>
+            </TouchableOpacity>
+        </View>
+        <View style={styles.inputContainer}>
             <View style={styles.inputView}>
                 <TextInput 
                     type="text" 
@@ -48,7 +57,7 @@ class SearchRooms extends React.Component {
                     label="roomCode"
                     name="roomCode" 
                     onChangeText={text => this.setState({roomCode:text})}
-                    placeholder="Search for rooms using invite code"
+                    placeholder="Join room using invite code"
                     placeholderTextColor="white" 
                     id="roomCode" />
             </View>
@@ -56,12 +65,11 @@ class SearchRooms extends React.Component {
                 style={styles.registerBtn}
                 onPress={this.handleSubmit} >
                 <Text 
-                    style={styles.registerText}>Search
-                    
+                    style={styles.registerText}>Join
                 </Text>
             </TouchableOpacity>
         </View>
-        <Header2 title="Chat List (returned):"/>
+        <Header2 title="Search Results:"/>
         <ScrollView style={ styles.cardContainer }>
           <Card containerStyle={{ borderRadius: 10 }}>
             <Card.Title>Chat 1</Card.Title>
@@ -116,7 +124,8 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
       justifyContent: "center",
-      alignItems: "center"
+      alignItems: "center",
+      marginBottom: 30
   },
   fixToText: {
     flexDirection: 'row',
@@ -142,11 +151,11 @@ const styles = StyleSheet.create({
     marginTop: 22
   },
   inputView: {
-    width: "80%",
+    width: "90%",
     backgroundColor: "grey",
     borderRadius: 10,
     height: 50,
-    marginBottom: 20,
+    marginBottom: 10,
     justifyContent: "center",
     padding: 20
   },
@@ -159,13 +168,12 @@ const styles = StyleSheet.create({
     fontSize: 14
 },
 registerBtn: {
-    width: "80%",
+    width: "90%",
     backgroundColor: "#5102A1",
     borderRadius: 25,
     height: 50,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 40,
     marginBottom: 10
 }
 });

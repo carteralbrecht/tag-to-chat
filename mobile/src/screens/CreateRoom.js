@@ -18,7 +18,9 @@ class CreateRoom extends React.Component {
           accessToken: this.props.route.params.accessToken,
           name: "",
           tags: "",
-          private: true
+          private: true,
+          success: "",
+          error: "",
         };
 
         this.oktaClient = new OktaClient(process.env.SERVER_URL);
@@ -42,7 +44,7 @@ class CreateRoom extends React.Component {
               return console.log(response.err);
             }
 
-            alert('Chat Room Created!');
+            this.setState({ success: "Chat Room Created!" });
         }
     }
     validate(){
@@ -50,12 +52,14 @@ class CreateRoom extends React.Component {
     
         if (this.state.name == "") {
           isValid = false;
-          alert("Please enter a name for your room");
+          this.setState({ error: "Please enter a name for your room" });
+          return isValid;
         }
     
         if (this.state.tags == "") {
           isValid = false;
-          alert("Please enter at least one room tag");
+          this.setState({ error: "Please enter at least one room tag" });
+          return isValid;
         } 
     
         return isValid;

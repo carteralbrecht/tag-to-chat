@@ -17,6 +17,7 @@ class Reg extends React.Component {
       email: "",
       password: "",
       confirmPassword: "",
+      error: ""
     };
 
     this.oktaClient = new OktaClient(process.env.SERVER_URL);
@@ -49,22 +50,26 @@ class Reg extends React.Component {
 
     if (this.state.nickname == "") {
       isValid = false;
-      alert("Please enter a nickname.");
+      this.setState({ error: "Please enter a nickname" });
+      return isValid;
     }
 
     if (this.state.email == "") {
       isValid = false;
-      alert("Please enter your email address.");
+      this.setState({ error: "Please enter an email" });
+      return isValid;
     }
 
     if (this.state.password == "") {
       isValid = false;
-      alert("Please enter a password.");
+      this.setState({ error: "Please enter a password" });
+      return isValid;
     }
 
     if (this.state.confirmPassword == "") {
       isValid = false;
-      alert("Please confirm your password.");
+      this.setState({ error: "Please confirm password" });
+      return isValid;
     }
 
     if (
@@ -73,7 +78,8 @@ class Reg extends React.Component {
     ) {
       if (this.state.password != this.state.confirmPassword) {
         isValid = false;
-        alert("Passwords do not match");
+        this.setState({ error: "Passwords do not match" });
+        return isValid;
       }
     }
     return isValid;
@@ -83,6 +89,7 @@ class Reg extends React.Component {
     return (
       <View style={styles.container}>
         <Text style={styles.titleText}>Registration </Text>
+        <Text style={styles.error}>{this.state.error}</Text>
         <View style={styles.inputView}>
           <TextInput
             type="text"
@@ -183,7 +190,13 @@ const styles = StyleSheet.create({
         alignItems: "center",
         marginTop: 40,
         marginBottom: 10
-    }
+    },
+
+    error: {
+      fontSize: 12,
+      color: "yellow",
+      marginBottom: 10,
+    },
 })
   
 export default Reg;

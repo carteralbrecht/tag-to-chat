@@ -18,7 +18,8 @@ class LoginScreen extends React.Component {
       username: "",
       password: "",
       forgotOpen: false,
-      forgotErr: ""
+      forgotErr: "",
+      error: "",
     };
 
     this.oktaClient = new OktaClient(process.env.SERVER_URL);
@@ -41,11 +42,11 @@ class LoginScreen extends React.Component {
 
   async login() {
     if (this.state.email == "") {
-      return alert("Please enter your email");
+      return this.setState({ error: "Please enter an email" });
     }
 
     if (this.state.password == "") {
-      return alert("Please enter your password");
+      return this.setState({ error: "Please enter a password" });
     }
 
     let response = await this.oktaClient.signIn(this.state);
@@ -69,7 +70,8 @@ class LoginScreen extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.welcomeText}>Welcome!{"\n"}Let's Chat</Text>
+        <Text style={styles.welcomeText}>tagToChat</Text>
+        <Text style={styles.error}>{this.state.error}</Text>
         <View style={styles.inputView}>
           <TextInput
             style={styles.inputText}
@@ -217,7 +219,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 10,
     marginBottom: 10
-  }
+  },
+
+  error: {
+    fontSize: 12,
+    color: "yellow",
+    marginBottom: 10,
+  },
 });
 
 export default LoginScreen;

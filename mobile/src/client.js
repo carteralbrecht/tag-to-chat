@@ -251,8 +251,7 @@ class Client {
             return {err: 'Error joining room'};
         }
 
-        const room = await response.json();
-        return room;
+        return {};
     }
 
     async leaveRoom(roomId) {
@@ -273,8 +272,7 @@ class Client {
             return {err: 'Error leaving room'};
         }
 
-        const room = await response.json();
-        return room;
+        return {};
     }
 
     async getRooms() {

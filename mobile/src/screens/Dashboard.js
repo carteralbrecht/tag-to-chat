@@ -68,12 +68,12 @@ class Dashboard extends React.Component {
     await this.updateInfo();
   }
 
-  handleToChat(roomId) {
+  handleToChat(room) {
     let data = {
       accessToken: this.state.accessToken,
       userId: this.state.userId,
       nickName: this.state.profile.nickName,
-      activeRoom: roomId
+      room: room
     }
 
     this.props.navigation.navigate('Chat', data);
@@ -142,7 +142,7 @@ class Dashboard extends React.Component {
         </View>
         <Header2 title="Chat List:"/>
         <ScrollView style={ styles.cardContainer }>
-          {this.state.rooms.map((room) => (
+          {this.state.rooms.length > 0 ? this.state.rooms.map((room) => (
             <Card key={room._id} containerStyle={{ borderRadius: 10 }}>
               <Card.Title>{room.name}</Card.Title>
               <Text style={{marginBottom: 10}}>
@@ -151,7 +151,7 @@ class Dashboard extends React.Component {
               <Card.Divider/>
               <Button
                 title='Open'
-                onPress={() => this.handleToChat(room._id)}
+                onPress={() => this.handleToChat(room)}
                 color="#5102A1"
               />
 
@@ -161,7 +161,12 @@ class Dashboard extends React.Component {
                 onPress={() => this.deleteConfirmation(room._id)}
               />
             </Card> 
-          ))}
+          )) : 
+            <View style={{justifyContent: "center", alignItems: "center", padding: 20, marginTop: 200}}>
+              <Text style={{fontSize: 22, color: "white"}}>Looks like you aren't in any rooms</Text>
+              <Text style={{fontSize: 22, color: "white"}}>Join or create one to get started</Text>
+            </View>
+          }
         </ScrollView>
       </View> 
     );

@@ -31,9 +31,10 @@ router.get('/', authenticateUser, async (req, res) => {
 */
 router.post('/tags', authenticateUser, async (req, res) => {
   if (!req.body) return res.sendStatus(400);
-
+  const userId = res.locals.claims.userId;
   const tagsLookingFor = arrayToLower(req.body.tags);
-  const conditions = {tags: {$in: tagsLookingFor}};
+
+  const conditions = {tags: {$in: tagsLookingFor}, 'users.userId': {$ne: userId}};
 
   Room.find(conditions).exec((err, rooms) => {
     if (err) {

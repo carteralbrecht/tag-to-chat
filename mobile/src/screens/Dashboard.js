@@ -10,7 +10,7 @@ import {
   Button,
 } from "react-native";
 import { Card, Icon } from "react-native-elements";
-import OktaClient from "../oktaClient.js";
+import Client from "../client.js";
 
 class Dashboard extends React.Component {
   constructor(props) {
@@ -22,10 +22,10 @@ class Dashboard extends React.Component {
       rooms: []
     };
 
-    this.oktaClient = new OktaClient(process.env.SERVER_URL);
+    this.client = new Client(process.env.SERVER_URL);
 
     if (this.state.accessToken) {
-      this.oktaClient.setAccessToken(this.state.accessToken);
+      this.client.setAccessToken(this.state.accessToken);
     } else {
       // User needs to login
       this.props.navigation.navigate('Login');
@@ -35,7 +35,7 @@ class Dashboard extends React.Component {
 
 
   async checkUser() {
-    const response = await this.oktaClient.getUser();
+    const response = await this.client.getUser();
     if (response.err) {
       return console.log(response.err);
     }
@@ -45,7 +45,7 @@ class Dashboard extends React.Component {
   }
 
   async updateRooms() {
-    const response = await this.oktaClient.getRooms();
+    const response = await this.client.getRooms();
     if (response.err) {
       return console.log(response.err);
     }
@@ -61,7 +61,7 @@ class Dashboard extends React.Component {
 
   async handleRemoveRoom(roomId) {
     const ownerId = this.state.rooms.filter(e => e._id === roomId)[0].ownerId;
-    const response = await this.oktaClient.removeRoom(roomId, ownerId);
+    const response = await this.client.removeRoom(roomId, ownerId);
     if (response.err) {
       return console.log(response.err);
     }
@@ -119,7 +119,9 @@ class Dashboard extends React.Component {
             size={30}
             color='#fff'
             title="Search"
-            onPress={() => this.props.navigation.navigate("Search") }
+            onPress={() => this.props.navigation.navigate("Search", {
+              accessToken: this.state.accessToken
+            })}
           />
           <Header title="Dashboard"/>
           <Icon

@@ -1,4 +1,4 @@
-class OktaClient {
+class Client {
     constructor(serverDomain) {
         this.serverDomain = serverDomain;
 
@@ -13,6 +13,7 @@ class OktaClient {
         this.createRoomUrl = `${this.roomsUrl}/create`;
         this.removeRoomUrl = `${this.roomsUrl}/remove`;
         this.deleteRoomUrl = `${this.roomsUrl}/delete`;
+        this.searchUrl = `${this.roomsUrl}/tags`;
 
         this.usersUrl = `${this.serverUrl}/users`;
         this.forgotUrl = `${this.usersUrl}/forgot`;
@@ -94,6 +95,30 @@ class OktaClient {
         this.userId = user.id;
 
         return {user};
+    }
+
+    async search(tags) {
+        let response;
+        try {
+            response = await fetch(this.searchUrl, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.accessToken}`
+                },
+                body: JSON.stringify({tags})
+            });
+        } catch (err) {
+            return {err};
+        }
+
+        if (response.status !== 200) {
+            return {err: 'Error searching for rooms'};
+        }
+
+        const rooms = await response.json();
+        return {rooms};
     }
 
     async deleteRoom(roomId) {
@@ -314,4 +339,4 @@ class OktaClient {
     }
 }
 
-module.exports = OktaClient;
+module.exports = Client;

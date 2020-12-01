@@ -15,14 +15,52 @@ import {
 } from "react-native";
 import { Card, ListItem, Icon } from "react-native-elements"
 
+import Client from "../client.js";
 
 class SearchRooms extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      accessToken: this.props.route.params.accessToken,
+      rooms: [],
+      tags: [],
+      roomCode: ""
+    }
 
-  state = {
-    nickname: "",
-    firstName: "",
-    lastName: ""
-  };
+    this.client = new Client(process.env.SERVER_URL);
+
+    if (this.state.accessToken) {
+      this.client.setAccessToken(this.state.accessToken);
+    } else {
+      // User needs to login
+      this.props.navigation.navigate('Login');
+    }
+
+    this.handleSearch = this.handleSearch.bind(this);
+  }
+
+  async handleSearch() {
+    const response = await this.client.search(this.state.tags);
+    if (response.err) {
+      return console.log(response.err);
+    }
+
+    console.log(response);
+
+    this.setState({rooms: response.rooms});
+
+    this._inputElement.blur();
+  }
+
+  async handleAddRoom(roomId) {
+    const response = await this.client.addRoom(roomId);
+    if (response.err) {
+      return console.log(response.err);
+    }
+
+    // Reset room list excluding room user just added
+    await this.handleSearch();
+  }
 
   render() {
     const statusbar = (Platform.OS == 'ios') ? <View style={styles.statusbar}></View> : <View></View>;
@@ -31,14 +69,17 @@ class SearchRooms extends React.Component {
         <Header2 title="Enter Chat Room Information"/>
         <View style={styles.inputContainer}>
             <View style={styles.inputView}>
-                <TextInput 
+                <TextInput
+                    ref={ref => { this._inputElement = ref }}
                     type="text" 
                     style={styles.inputText}
                     label="roomTag"
                     name="roomTag" 
-                    onChangeText={text => this.setState({roomTag:text})}
-                    placeholder="Search for rooms using tags"
-                    placeholderTextColor="white" 
+                    onChangeText={text => this.setState({tags:text.split(' ')})}
+                    placeholder="Room tags (Separate with spaces)"
+                    placeholderTextColor="white"
+                    enablesReturnKeyAutomatically={true}
+                    keyboardAppearance="dark"
                     id="roomTag" />
             </View>
             <TouchableOpacity 
@@ -58,12 +99,14 @@ class SearchRooms extends React.Component {
                     name="roomCode" 
                     onChangeText={text => this.setState({roomCode:text})}
                     placeholder="Join room using invite code"
-                    placeholderTextColor="white" 
+                    placeholderTextColor="white"
+                    enablesReturnKeyAutomatically={true}
+                    keyboardAppearance="dark"
                     id="roomCode" />
             </View>
             <TouchableOpacity 
                 style={styles.registerBtn}
-                onPress={this.handleSubmit} >
+                onPress={this.handleSearch} >
                 <Text 
                     style={styles.registerText}>Join
                 </Text>
@@ -71,42 +114,25 @@ class SearchRooms extends React.Component {
         </View>
         <Header2 title="Search Results:"/>
         <ScrollView style={ styles.cardContainer }>
-          <Card containerStyle={{ borderRadius: 10 }}>
-            <Card.Title>Chat 1</Card.Title>
-            <Text style={{marginBottom: 10}}>
-              Description for Chat 1
-            </Text>
-            <Card.Divider/>
-            <Button
-              title='Open'
-              onPress={() => Alert.alert('Chat 1 button pressed')}
-              color="#5102A1"
-            />
-          </Card> 
-          <Card containerStyle={{ borderRadius: 10 }}>
-            <Card.Title>Chat 2</Card.Title>
-            <Text style={{marginBottom: 10}}>
-              Description for Chat 2
-            </Text>
-            <Card.Divider/>
-            <Button
-              title='Open'
-              onPress={() => Alert.alert('Chat 2 button pressed')}
-              color="#5102A1"
-            />
-          </Card> 
-          <Card containerStyle={{ borderRadius: 10 }}>
-            <Card.Title>Chat 3</Card.Title>
-            <Text style={{marginBottom: 10}}>
-              Description for Chat 3
-            </Text>
-            <Card.Divider/>
-            <Button
-              title='Open'
-              onPress={() => Alert.alert('Chat 3 button pressed')}
-              color="#5102A1"
-            />
-          </Card>  
+          {
+          this.state.rooms.length > 0 ? this.state.rooms.map((room) => (
+            <Card containerStyle={{ borderRadius: 10 }}>
+              <Card.Title>{room.name}</Card.Title>
+              <Text style={{marginBottom: 10}}>
+                Tags: {room.tags.join(', ')}
+              </Text>
+              <Card.Divider/>
+              <Button
+                title='Add'
+                onPress={async () => await handleAddRoom(room._id)}
+                color="#5102A1"
+              />
+            </Card> 
+          )) : 
+            <View style={styles.resultsView}>
+              <Text style={styles.resultText}>No rooms found</Text>
+            </View>
+          }
         </ScrollView>
     </View> 
     );
@@ -114,6 +140,15 @@ class SearchRooms extends React.Component {
 }
 
 const styles = StyleSheet.create({
+  resultText: {
+    color: "white",
+    fontSize: 25,
+    marginTop: 100
+  },
+  resultsView: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
   statusbar: {
     backgroundColor: "#5102A1",
     height: 34

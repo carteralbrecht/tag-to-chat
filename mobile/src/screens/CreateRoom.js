@@ -9,7 +9,7 @@ import {
   View
 } from "react-native";
 import { CheckBox } from "react-native-elements"
-import OktaClient from "../oktaClient.js";
+import Client from "../client.js";
 
 class CreateRoom extends React.Component {
     constructor(props) {
@@ -21,10 +21,10 @@ class CreateRoom extends React.Component {
           private: true
         };
 
-        this.oktaClient = new OktaClient(process.env.SERVER_URL);
+        this.client = new Client(process.env.SERVER_URL);
 
         if (this.state.accessToken) {
-          this.oktaClient.setAccessToken(this.state.accessToken);
+          this.client.setAccessToken(this.state.accessToken);
         } else {
           // User needs to login
           this.props.navigation.navigate('Login');
@@ -37,7 +37,7 @@ class CreateRoom extends React.Component {
         event.preventDefault();
       
         if(this.validate()){
-            const response = await this.oktaClient.createRoom(this.state);
+            const response = await this.client.createRoom(this.state);
             if (response.err) {
               return console.log(response.err);
             }
@@ -74,7 +74,9 @@ class CreateRoom extends React.Component {
                 name="roomName" 
                 onChangeText={text => this.setState({name:text})}
                 placeholder="Chat Room Name"
-                placeholderTextColor="white" 
+                placeholderTextColor="white"
+                enablesReturnKeyAutomatically
+                keyboardAppearance="dark"
                 id="roomName"
             />
         </View>
@@ -84,9 +86,11 @@ class CreateRoom extends React.Component {
                 style={styles.inputText}
                 label="roomTags"
                 name="roomTags" 
-                onChangeText={text => this.setState({tags:text})}
-                placeholder="Chat Room Tags"
-                placeholderTextColor="white" 
+                onChangeText={text => this.setState({tags:text.split(' ')})}
+                placeholder="Room tags (Separate with spaces)"
+                placeholderTextColor="white"
+                enablesReturnKeyAutomatically
+                keyboardAppearance="dark" 
                 id="roomTags"
             />
         </View>

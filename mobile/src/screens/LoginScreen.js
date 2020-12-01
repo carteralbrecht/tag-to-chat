@@ -8,7 +8,7 @@ import {
   Modal
 } from "react-native";
 
-import OktaClient from '../oktaClient.js';
+import Client from '../client.js';
 
 class LoginScreen extends React.Component {
   constructor() {
@@ -21,7 +21,7 @@ class LoginScreen extends React.Component {
       forgotErr: ""
     };
 
-    this.oktaClient = new OktaClient(process.env.SERVER_URL);
+    this.client = new Client(process.env.SERVER_URL);
 
     this.handleForgot = this.handleForgot.bind(this);
   }
@@ -31,7 +31,7 @@ class LoginScreen extends React.Component {
   }
 
   async handleForgot() {
-    const response = await this.oktaClient.forgot(this.state);
+    const response = await this.client.forgot(this.state);
     if (response.err) {
       return console.log(response.err);
     }
@@ -48,14 +48,14 @@ class LoginScreen extends React.Component {
       return alert("Please enter your password");
     }
 
-    let response = await this.oktaClient.signIn(this.state);
+    let response = await this.client.signIn(this.state);
     if (response.err) {
       return console.log('Error signing in user: ', response.err);
     }
 
     const sessionToken = response.sessionToken;
 
-    response = await this.oktaClient.generateAccessToken(sessionToken);
+    response = await this.client.generateAccessToken(sessionToken);
     if (response.err) {
       return console.log('Error getting access token: ', response.err);
     }
@@ -75,6 +75,9 @@ class LoginScreen extends React.Component {
             style={styles.inputText}
             placeholder="Email..."
             placeholderTextColor="white"
+            enablesReturnKeyAutomatically
+            keyboardAppearance="dark"
+            keyboardType="email-address"
             onChangeText={(text) => this.setState({ email: text })}
           />
         </View>
@@ -84,6 +87,8 @@ class LoginScreen extends React.Component {
             secureTextEntry
             placeholder="Password..."
             placeholderTextColor="white"
+            enablesReturnKeyAutomatically
+            keyboardAppearance="dark"
             onChangeText={(text) => this.setState({ password: text })}
           />
         </View>
@@ -112,6 +117,9 @@ class LoginScreen extends React.Component {
                     placeholder="Email.."
                     placeholderTextColor="white"
                     value={this.state.email}
+                    enablesReturnKeyAutomatically
+                    keyboardAppearance="dark"
+                    keyboardType="email-address"
                     onChangeText={(text) => this.setState({ email: text })}
                   />
                 </View>

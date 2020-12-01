@@ -8,7 +8,6 @@ import Register from "./screens/Registration";
 import Dashboard from "./screens/Dashboard";
 import UpdateUser from "./screens/UpdateUser";
 import SearchRooms from "./screens/SearchRooms";
-import DrawerNavigator from "./ChatDrawerNavigator";
 import CreateRoom from "./screens/CreateRoom";
 
 const Stack = createStackNavigator();
@@ -71,7 +70,7 @@ export const AppNavigator = () => (
         }}
       />
       <Stack.Screen
-        name="Create"
+        name="Add"
         component={CreateRoom}
         options={{ headerShown: true }}
       />

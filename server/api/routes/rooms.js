@@ -273,15 +273,13 @@ router.post('/join/:roomId', authenticateUser, async (req, res) => {
     - Adds user to room
     - Called by user
 */
-router.post('/add/:roomId', authenticateUser, async (req, res) => {
+router.post('/add', authenticateUser, async (req, res) => {
   if (!req.body) return res.sendStatus(400);
 
-  const roomId = req.params.roomId;
   const userId = res.locals.claims.userId;
   const joinCode = req.body.joinCode;
 
   const conditions = {
-    '_id': roomId,
     joinCode,
     'users.userId': {$ne: userId},
   };
@@ -309,7 +307,7 @@ router.post('/add/:roomId', authenticateUser, async (req, res) => {
   user.profile.roomsAdded.push(roomId);
   await user.update();
 
-  return res.status(200).send(room);
+  return res.sendStatus(200);
 });
 
 /*

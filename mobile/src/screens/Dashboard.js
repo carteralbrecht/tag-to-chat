@@ -32,8 +32,6 @@ class Dashboard extends React.Component {
     }
   }
 
-
-
   async checkUser() {
     const response = await this.client.getUser();
     if (response.err) {
@@ -110,7 +108,7 @@ class Dashboard extends React.Component {
             size={30}
             color="#fff" 
             title="Profile"
-            onPress={() => this.props.navigation.navigate("Create", {
+            onPress={() => this.props.navigation.navigate("Add", {
               accessToken: this.state.accessToken
             })}
           />
@@ -127,7 +125,7 @@ class Dashboard extends React.Component {
           <Icon
             name='face'
             size={30}
-            color="#fff" 
+            color="#fff"
             title="Profile"
             onPress={() => this.props.navigation.navigate("Profile", {
               accessToken: this.state.accessToken,
@@ -140,7 +138,7 @@ class Dashboard extends React.Component {
             onPress={() => this.props.navigation.navigate("Login") }
           />
         </View>
-            <Header2 title="Chat List:"/>
+        <Header2 title="Chat List:"/>
         <ScrollView style={ styles.cardContainer }>
           {this.state.rooms.map((room) => (
             <Card key={room._id} containerStyle={{ borderRadius: 10 }}>
@@ -163,8 +161,7 @@ class Dashboard extends React.Component {
             </Card> 
           ))}
         </ScrollView>
-
-    </View> 
+      </View> 
     );
   }
 }

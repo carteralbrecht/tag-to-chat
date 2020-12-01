@@ -18,6 +18,7 @@ class CreateRoom extends React.Component {
           accessToken: this.props.route.params.accessToken,
           name: "",
           tags: "",
+          roomCode: "",
           private: true
         };
 
@@ -30,22 +31,41 @@ class CreateRoom extends React.Component {
           this.props.navigation.navigate('Login');
         }
          
-        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleCreateRoom = this.handleCreateRoom.bind(this);
+        this.handleAddRoom = this.handleAddRoom.bind(this);
+    }
+
+    async handleAddRoom(event) {
+      event.preventDefault();
+
+      if (this.validateAdd()) {
+        const response = await this.client.addRoomCode(this.state.roomCode);
+        if (response.err) {
+          return console.log(response.err);
+        }
+
+        this.props.navigation.navigate('Dashboard');
+      }
     }
          
-    async handleSubmit(event) {
+    async handleCreateRoom(event) {
         event.preventDefault();
       
-        if(this.validate()){
-            const response = await this.client.createRoom(this.state);
-            if (response.err) {
-              return console.log(response.err);
-            }
+        if(this.validateCreate()){
+          const response = await this.client.createRoom(this.state);
+          if (response.err) {
+            return console.log(response.err);
+          }
 
-            alert('Chat Room Created!');
+          this.props.navigation.navigate('Dashboard');
         }
     }
-    validate(){
+
+    validateAdd(){
+      return this.state.roomCode !== "";
+  }
+
+    validateCreate(){
         let isValid = true; 
     
         if (this.state.name == "") {
@@ -64,53 +84,75 @@ class CreateRoom extends React.Component {
   render() {
     return (
       <View style={ styles.container }>
+        <Header2 title="Join a Chat Room"/>
+        <View style={styles.inputContainer}>
+          <View style={styles.inputView}>
+            <TextInput 
+              type="text" 
+              style={styles.inputText}
+              label="roomCode"
+              name="roomCode" 
+              onChangeText={text => this.setState({roomCode:text})}
+              placeholder="Join room using invite code"
+              placeholderTextColor="white"
+              enablesReturnKeyAutomatically={true}
+              keyboardAppearance="dark"
+              id="roomCode" />
+          </View>
+          <TouchableOpacity 
+            style={styles.addBtn}
+            onPress={this.handleAddRoom}
+          >
+            <Text style={styles.registerText}>Add Room</Text>
+          </TouchableOpacity>
+        </View>
         <Header2 title="Create a Chat Room"/>
         <View style={styles.inputContainer}>
-        <View style={styles.inputView}>
-            <TextInput 
-                type="text" 
-                style={styles.inputText}
-                label="roomName"
-                name="roomName" 
-                onChangeText={text => this.setState({name:text})}
-                placeholder="Chat Room Name"
-                placeholderTextColor="white"
-                enablesReturnKeyAutomatically
-                keyboardAppearance="dark"
-                id="roomName"
-            />
-        </View>
-        <View style={styles.inputView}>
-            <TextInput 
-                type="text" 
-                style={styles.inputText}
-                label="roomTags"
-                name="roomTags" 
-                onChangeText={text => this.setState({tags:text.split(' ')})}
-                placeholder="Room tags (Separate with spaces)"
-                placeholderTextColor="white"
-                enablesReturnKeyAutomatically
-                keyboardAppearance="dark" 
-                id="roomTags"
-            />
-        </View>
-        <View>
-            <CheckBox
-                center
-                title='Private'
-                checkedIcon='check'
-                checkedColor="#5102A1"
-                uncheckedIcon='close'
-                checked={this.state.private}
-                onPress={() => this.setState({private: !this.state.private})}
-            />
-        </View>
-            <TouchableOpacity 
-              style={styles.registerBtn}
-              onPress={this.handleSubmit}
-            >
-              <Text style={styles.registerText}>Create Room</Text>
-            </TouchableOpacity>
+          <View style={styles.inputView}>
+              <TextInput 
+                  type="text" 
+                  style={styles.inputText}
+                  label="roomName"
+                  name="roomName" 
+                  onChangeText={text => this.setState({name:text})}
+                  placeholder="Chat Room Name"
+                  placeholderTextColor="white"
+                  enablesReturnKeyAutomatically
+                  keyboardAppearance="dark"
+                  id="roomName"
+              />
+          </View>
+          <View style={styles.inputView}>
+              <TextInput 
+                  type="text" 
+                  style={styles.inputText}
+                  label="roomTags"
+                  name="roomTags" 
+                  onChangeText={text => this.setState({tags:text.split(' ')})}
+                  placeholder="Room tags (Separate with spaces)"
+                  placeholderTextColor="white"
+                  enablesReturnKeyAutomatically
+                  keyboardAppearance="dark" 
+                  id="roomTags"
+              />
+          </View>
+          <View>
+              <CheckBox
+                  center
+                  title='Private'
+                  checkedIcon='check'
+                  checkedColor="#5102A1"
+                  uncheckedIcon='close'
+                  checked={this.state.private}
+                  onPress={() => this.setState({private: !this.state.private})}
+              />
+          </View>
+          <TouchableOpacity 
+            style={styles.registerBtn}
+            onPress={this.handleCreateRoom}
+          >
+            <Text style={styles.registerText}>Create Room</Text>
+          </TouchableOpacity>
         </View>
     </View> 
     );
@@ -128,7 +170,8 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
       justifyContent: "center",
-      alignItems: "center"
+      alignItems: "center",
+      marginTop: 10
   },
   fixToText: {
     flexDirection: 'row',
@@ -170,6 +213,16 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 14
 },
+addBtn: {
+  width: "80%",
+  backgroundColor: "#5102A1",
+  borderRadius: 25,
+  height: 50,
+  justifyContent: "center",
+  alignItems: "center",
+  marginTop: 10,
+  marginBottom: 10
+},
 registerBtn: {
     width: "80%",
     backgroundColor: "#5102A1",
@@ -177,7 +230,7 @@ registerBtn: {
     height: 50,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 40,
+    marginTop: 20,
     marginBottom: 10
 }
 });

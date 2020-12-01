@@ -13,6 +13,7 @@ class Client {
         this.createRoomUrl = `${this.roomsUrl}/create`;
         this.removeRoomUrl = `${this.roomsUrl}/remove`;
         this.deleteRoomUrl = `${this.roomsUrl}/delete`;
+        this.addRoomUrl = `${this.roomsUrl}/add`;
         this.searchUrl = `${this.roomsUrl}/tags`;
 
         this.usersUrl = `${this.serverUrl}/users`;
@@ -183,6 +184,50 @@ class Client {
 
         if (response.status !== 200) {
             return {err: 'Error creating room'};
+        }
+
+        return {};
+    }
+
+    async addRoomCode(joinCode) {
+        let response;
+        try {
+            response = await fetch(`${this.addRoomUrl}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.accessToken}`
+                },
+                body: JSON.stringify({joinCode})
+            });
+        } catch (err) {
+            return {err};
+        }
+
+        if (response.status !== 200) {
+            return {err: 'Error adding room with room code'};
+        }
+
+        return {};
+    }
+
+    async addRoom(roomId) {
+        let response;
+        try {
+            response = await fetch(`${this.addRoomUrl}/${roomId}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${this.accessToken}`
+                }
+            });
+        } catch (err) {
+            return {err};
+        }
+
+        if (response.status !== 200) {
+            return {err: 'Error adding room'};
         }
 
         return {};

@@ -96,7 +96,7 @@ router.post('/create', authenticateUser, async (req, res) => {
   user.profile.roomsAdded.push(roomId);
   await user.update();
 
-  return res.status(200).send(data);
+  return res.sendStatus(200);
 });
 
 /*
@@ -225,7 +225,7 @@ router.post('/leave/:roomId', authenticateUser, async (req, res) => {
   user.profile.roomActive = '';
   await user.update();
 
-  return res.status(200).send(room);
+  return res.sendStatus(200);
 });
 
 /*
@@ -266,7 +266,7 @@ router.post('/join/:roomId', authenticateUser, async (req, res) => {
   user.profile.roomActive = roomId;
   await user.update();
 
-  return res.status(200).send(room);
+  return res.sendStatus(200);
 });
 
 /*
@@ -278,10 +278,52 @@ router.post('/add/:roomId', authenticateUser, async (req, res) => {
 
   const roomId = req.params.roomId;
   const userId = res.locals.claims.userId;
-  const joinCode = req.body.joinCode;
 
   const conditions = {
     '_id': roomId,
+    'private': false,
+    'users.userId': {$ne: userId},
+  };
+
+  const update = {
+    $addToSet: {users: {userId, active: false}},
+  };
+
+  let room;
+  try {
+    room = await Room.findOneAndUpdate(conditions, update, {new: true});
+  } catch (err) {
+    return res.status(500).send(err);
+  }
+
+  if (!room) return res.sendStatus(500);
+
+  let user;
+  try {
+    user = await oktaClient.getUser(userId);
+  } catch (err) {
+    return res.status(500).send(err);
+  }
+
+  if (!user.profile.roomsAdded) user.profile.roomsAdded = [];
+
+  user.profile.roomsAdded.push(roomId);
+  await user.update();
+
+  return res.sendStatus(200);
+});
+
+/*
+    - Adds user to room
+    - Called by user
+*/
+router.post('/add', authenticateUser, async (req, res) => {
+  if (!req.body) return res.sendStatus(400);
+
+  const userId = res.locals.claims.userId;
+  const joinCode = req.body.joinCode;
+
+  const conditions = {
     joinCode,
     'users.userId': {$ne: userId},
   };
@@ -297,6 +339,8 @@ router.post('/add/:roomId', authenticateUser, async (req, res) => {
     return res.status(500).send(err);
   }
 
+  if (!room) return res.sendStatus(500);
+
   let user;
   try {
     user = await oktaClient.getUser(userId);
@@ -309,7 +353,7 @@ router.post('/add/:roomId', authenticateUser, async (req, res) => {
   user.profile.roomsAdded.push(roomId);
   await user.update();
 
-  return res.status(200).send(room);
+  return res.sendStatus(200);
 });
 
 /*

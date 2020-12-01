@@ -1,5 +1,4 @@
 import React from "react";
-import Header from "../components/Header";
 import Header2 from "../components/Header2";
 
 import {
@@ -10,10 +9,8 @@ import {
   ScrollView,
   View,
   Button,
-  Alert,
-  TouchableHighlight
 } from "react-native";
-import { Card, ListItem, Icon } from "react-native-elements"
+import { Card } from "react-native-elements"
 
 import Client from "../client.js";
 
@@ -87,28 +84,6 @@ class SearchRooms extends React.Component {
                 onPress={this.handleSubmit} >
                 <Text 
                     style={styles.registerText}>Search
-                </Text>
-            </TouchableOpacity>
-        </View>
-        <View style={styles.inputContainer}>
-            <View style={styles.inputView}>
-                <TextInput 
-                    type="text" 
-                    style={styles.inputText}
-                    label="roomCode"
-                    name="roomCode" 
-                    onChangeText={text => this.setState({roomCode:text})}
-                    placeholder="Join room using invite code"
-                    placeholderTextColor="white"
-                    enablesReturnKeyAutomatically={true}
-                    keyboardAppearance="dark"
-                    id="roomCode" />
-            </View>
-            <TouchableOpacity 
-                style={styles.registerBtn}
-                onPress={this.handleSearch} >
-                <Text 
-                    style={styles.registerText}>Join
                 </Text>
             </TouchableOpacity>
         </View>
@@ -190,6 +165,7 @@ const styles = StyleSheet.create({
     backgroundColor: "grey",
     borderRadius: 10,
     height: 50,
+    marginTop: 10,
     marginBottom: 10,
     justifyContent: "center",
     padding: 20
@@ -209,6 +185,7 @@ registerBtn: {
     height: 50,
     justifyContent: "center",
     alignItems: "center",
+    marginTop: 20,
     marginBottom: 10
 }
 });

@@ -189,7 +189,7 @@ class Client {
         return {};
     }
 
-    async addRoom(joinCode) {
+    async addRoomCode(joinCode) {
         let response;
         try {
             response = await fetch(`${this.addRoomUrl}`, {
@@ -200,6 +200,27 @@ class Client {
                     'Authorization': `Bearer ${this.accessToken}`
                 },
                 body: JSON.stringify({joinCode})
+            });
+        } catch (err) {
+            return {err};
+        }
+
+        if (response.status !== 200) {
+            return {err: 'Error adding room with room code'};
+        }
+
+        return {};
+    }
+
+    async addRoom(roomId) {
+        let response;
+        try {
+            response = await fetch(`${this.addRoomUrl}/${roomId}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${this.accessToken}`
+                }
             });
         } catch (err) {
             return {err};

@@ -23,7 +23,7 @@ class CreateRoom extends React.Component {
           error: "",
         };
 
-        this.oktaClient = new OktaClient(process.env.SERVER_URL);
+        this.oktaClient = new OktaClient("http://192.168.1.133:5000");
 
         if (this.state.accessToken) {
           this.oktaClient.setAccessToken(this.state.accessToken);

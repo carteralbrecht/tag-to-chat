@@ -20,7 +20,7 @@ class Reg extends React.Component {
       error: ""
     };
 
-    this.oktaClient = new OktaClient(process.env.SERVER_URL);
+    this.oktaClient = new OktaClient("http://192.168.1.133:5000");
 
     this.handleSubmit = this.handleSubmit.bind(this);
   }
@@ -48,7 +48,7 @@ class Reg extends React.Component {
   validate() {
     let isValid = true;
 
-    if (this.state.nickname == "") {
+    if (this.state.nickName == "") {
       isValid = false;
       this.setState({ error: "Please enter a nickname" });
       return isValid;

@@ -21,9 +21,10 @@ class MessageScreen extends React.Component {
       nickName: params.nickName,
       name: '',
       chat: [],
+      error: ""
     };
 
-    this.oktaClient = new OktaClient(process.env.SERVER_URL);
+    this.oktaClient = new OktaClient("http://192.168.1.133:5000");
 
     if (this.state.accessToken) {
       this.oktaClient.setAccessToken(this.state.accessToken);
@@ -36,7 +37,7 @@ class MessageScreen extends React.Component {
   async componentDidMount() {
     this.props.navigation.addListener('focus', async () => {
       // Socket stuff
-      this.socket = io(process.env.SERVER_URL);
+      this.socket = io("http://192.168.1.133:5000");
 
       this.socket.on('connect', () => {
         if (this.state.activeRoom) {
@@ -47,7 +48,7 @@ class MessageScreen extends React.Component {
       });
 
       this.socket.on('messageError', (err) => {
-        alert('error sending message');
+        this.setState({error: 'error sending message'})
         console.log(err);
       });
 

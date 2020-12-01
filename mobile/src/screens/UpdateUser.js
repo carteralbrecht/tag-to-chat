@@ -22,10 +22,11 @@ class UpdateUser extends React.Component {
       accessToken,
       nickName,
       firstName,
-      lastName
+      lastName,
+      error: ""
     };
 
-    this.oktaClient = new OktaClient(process.env.SERVER_URL);
+    this.oktaClient = new OktaClient("http://192.168.1.133:5000");
 
     if (this.state.accessToken) {
       this.oktaClient.setAccessToken(this.state.accessToken);
@@ -43,7 +44,7 @@ class UpdateUser extends React.Component {
       if(this.validate()){
           let response = await this.oktaClient.updateProfile({userInfo: this.state});
           if (response.err) {
-            alert('Error updating profile');
+            this.setState({error: 'Error updating profile'});
           }
           this.props.navigation.navigate('Dashboard');
       }
@@ -53,17 +54,20 @@ class UpdateUser extends React.Component {
   
       if (this.state.nickName == undefined) {
         isValid = false;
-        alert("Please enter a nickname.");
+        this.setState({error: "Please enter a nickname."});
+        return isValid
       }
   
       if (this.state.firstName == undefined) {
         isValid = false;
-        alert("Please enter your first name.");
+        this.setState({error: "Please enter your first name."});
+        return isValid
       } 
   
       if (this.state.lastName == undefined) {
         isValid = false;
-        alert("Please enter your last name.");
+        this.setState({error: "Please enter your last name."});
+        return isValid
       }
       return isValid;
   }

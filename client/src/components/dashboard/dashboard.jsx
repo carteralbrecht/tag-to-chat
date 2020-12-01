@@ -545,7 +545,9 @@ class Dashboard extends Component {
           Are you SURE you want to leave?
         </DialogTitle>
         <Button style={{backgroundColor: "red", color: "white"}}>Yes </Button>
-        <Button style={{backgroundColor: "blue", color: "white"}} onClick={this.handleDeleteVerificationClose}>No </Button>
+        <Button style={{backgroundColor: "blue", color: "white"}} onClick={this.handleDeleteVerificationClose}
+        >No
+        </Button>
         </Dialog>
 
         <Dialog

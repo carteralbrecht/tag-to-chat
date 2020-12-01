@@ -39,7 +39,7 @@ class CreateRoom extends React.Component {
       event.preventDefault();
 
       if (this.validateAdd()) {
-        const response = await this.client.addRoom(this.state.roomCode);
+        const response = await this.client.addRoomCode(this.state.roomCode);
         if (response.err) {
           return console.log(response.err);
         }

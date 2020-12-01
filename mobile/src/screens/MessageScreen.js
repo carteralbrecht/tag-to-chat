@@ -6,7 +6,7 @@ import Header from "../components/Header";
 
 import { AutoScrollFlatList } from "react-native-autoscroll-flatlist";
 
-import OktaClient from '../oktaClient.js';
+import Client from '../client.js';
 import config from '../config';
 const io = require("socket.io-client");
 
@@ -23,10 +23,10 @@ class MessageScreen extends React.Component {
       chat: [],
     };
 
-    this.oktaClient = new OktaClient(process.env.SERVER_URL);
+    this.client = new Client(process.env.SERVER_URL);
 
     if (this.state.accessToken) {
-      this.oktaClient.setAccessToken(this.state.accessToken);
+      this.client.setAccessToken(this.state.accessToken);
     } else {
       // User needs to login
       this.props.navigation.navigate('Login');
@@ -61,6 +61,7 @@ class MessageScreen extends React.Component {
 
     this.props.navigation.addListener('blur', async () => {
       if (this.state.activeRoom) {
+        this.setState({chat: []});
         this.socket.disconnect();
         await this.handleLeaveRoom(this.state.activeRoom);
       }
@@ -76,8 +77,8 @@ class MessageScreen extends React.Component {
 
     console.log('leaving ', activeRoom);
 
-    const accessToken = this.oktaClient.getAccessToken();
-    const response = await this.oktaClient.leaveRoom(activeRoom);
+    const accessToken = this.client.getAccessToken();
+    const response = await this.client.leaveRoom(activeRoom);
     if (response.err) {
       return console.log(response.err);
     }
@@ -92,8 +93,8 @@ class MessageScreen extends React.Component {
   }
 
   async handleJoinRoom(roomId) {
-    const accessToken = this.oktaClient.getAccessToken();
-    const response = await this.oktaClient.joinRoom(roomId);
+    const accessToken = this.client.getAccessToken();
+    const response = await this.client.joinRoom(roomId);
     if (response.err) {
       return console.log(response.err);
     }
@@ -112,7 +113,7 @@ class MessageScreen extends React.Component {
   }
 
   async submitHandler(content) {
-    const accessToken = await this.oktaClient.getAccessToken();
+    const accessToken = await this.client.getAccessToken();
     
     this.socket.emit('message', {
       accessToken,

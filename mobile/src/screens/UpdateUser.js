@@ -9,7 +9,7 @@ import {
   View
 } from "react-native";
 
-import OktaClient from '../oktaClient.js';
+import Client from '../client.js';
 
 
 class UpdateUser extends React.Component {
@@ -25,10 +25,10 @@ class UpdateUser extends React.Component {
       lastName
     };
 
-    this.oktaClient = new OktaClient(process.env.SERVER_URL);
+    this.client = new Client(process.env.SERVER_URL);
 
     if (this.state.accessToken) {
-      this.oktaClient.setAccessToken(this.state.accessToken);
+      this.client.setAccessToken(this.state.accessToken);
     } else {
       // User needs to login
       this.props.navigation.navigate('Login');
@@ -41,7 +41,7 @@ class UpdateUser extends React.Component {
       event.preventDefault();
     
       if(this.validate()){
-          let response = await this.oktaClient.updateProfile({userInfo: this.state});
+          let response = await this.client.updateProfile({userInfo: this.state});
           if (response.err) {
             alert('Error updating profile');
           }
@@ -83,6 +83,8 @@ class UpdateUser extends React.Component {
                 onChangeText={text => this.setState({nickName:text})}
                 placeholder="Nickname"
                 placeholderTextColor="white" 
+                enablesReturnKeyAutomatically
+                keyboardAppearance="dark"
                 value={this.state.nickName}
                 id="nickName" />
           </View>
@@ -94,7 +96,9 @@ class UpdateUser extends React.Component {
                 name="firstName" 
                 onChangeText={text => this.setState({firstName:text})}
                 placeholder="First Name"
-                placeholderTextColor="white" 
+                placeholderTextColor="white"
+                enablesReturnKeyAutomatically
+                keyboardAppearance="dark"
                 value={this.state.firstName}
                 id="firstName" />
           </View>
@@ -107,6 +111,8 @@ class UpdateUser extends React.Component {
                 onChangeText={text => this.setState({lastName:text})}
                 placeholder="Last Name"
                 placeholderTextColor="white"
+                enablesReturnKeyAutomatically
+                keyboardAppearance="dark"
                 value={this.state.lastName}
                 id="lastName" />
           </View>

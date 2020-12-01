@@ -7,7 +7,7 @@ import {
   View,
 } from "react-native";
 
-import OktaClient from '../oktaClient.js';
+import Client from '../client.js';
 
 class Reg extends React.Component {
   constructor() {
@@ -19,7 +19,7 @@ class Reg extends React.Component {
       confirmPassword: "",
     };
 
-    this.oktaClient = new OktaClient(process.env.SERVER_URL);
+    this.client = new Client(process.env.SERVER_URL);
 
     this.handleSubmit = this.handleSubmit.bind(this);
   }
@@ -32,7 +32,7 @@ class Reg extends React.Component {
       return;
     }
 
-    let response = await this.oktaClient.register(this.state);
+    let response = await this.client.register(this.state);
     if (response.err) {
       return console.log(response.err);
     }
@@ -92,6 +92,8 @@ class Reg extends React.Component {
             onChangeText={(text) => this.setState({ nickName: text })}
             placeholder="Enter nickname"
             placeholderTextColor="white"
+            enablesReturnKeyAutomatically
+            keyboardAppearance="dark"
             id="username"
           />
         </View>
@@ -103,6 +105,8 @@ class Reg extends React.Component {
             onChangeText={(text) => this.setState({ email: text })}
             placeholder="Enter email"
             placeholderTextColor="white"
+            enablesReturnKeyAutomatically
+            keyboardAppearance="dark"
             id="email"
           />
         </View>
@@ -113,10 +117,13 @@ class Reg extends React.Component {
             style={styles.inputText}
             label="password"
             name="password"
-            secureTextEntry={true}
+            secureTextEntry
             onChangeText={(text) => this.setState({ password: text })}
             placeholder="Enter password"
             placeholderTextColor="white"
+            enablesReturnKeyAutomatically
+            keyboardAppearance="dark"
+            keyboardType="email-address"
             id="password"
           />
         </View>
@@ -127,10 +134,12 @@ class Reg extends React.Component {
             style={styles.inputText}
             label="Confirm Password"
             name="confirmPassword"
-            secureTextEntry={true}
+            secureTextEntry
             onChangeText={(text) => this.setState({ confirmPassword: text })}
             placeholder="Confirm password"
             placeholderTextColor="white"
+            enablesReturnKeyAutomatically
+            keyboardAppearance="dark"
             id="confirmPassword"
           />
         </View>

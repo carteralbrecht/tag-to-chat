@@ -139,7 +139,6 @@ class Dashboard extends React.Component {
           />
         </View>
             <Header2 title="Chat List:"/>
-{/*}
         <ScrollView style={ styles.cardContainer }>
           {this.state.rooms.map((room) => (
             <Card key={room._id} containerStyle={{ borderRadius: 10 }}>
@@ -162,7 +161,7 @@ class Dashboard extends React.Component {
             </Card> 
           ))}
         </ScrollView>
-          */}
+
     </View> 
     );
   }

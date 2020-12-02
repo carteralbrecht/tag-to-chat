@@ -4,10 +4,14 @@ body {
 }
 
 #chat {
-    min-height: 100%;
-    min-width: 100%;
-    overflow: scroll;
+    background-color: #f5f5f5;
+    max-height: calc(100vh - 300px);
+    width: 96%;
+    margin-bottom: 10%;
     padding: 16px;
+    margin-left: 2%;
+    margin-right: 2%;
+    margin-top: 2%;
 }
 
 .name {

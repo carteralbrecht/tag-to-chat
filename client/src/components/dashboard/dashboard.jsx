@@ -222,6 +222,9 @@ class Dashboard extends Component {
 
   async handleLeaveRoom(roomId) {
     const accessToken = await this.props.authService.getAccessToken();
+
+    this.socket.emit('leaveRoom', accessToken);
+
     const response = await fetch(`/api/rooms/leave/${roomId}`, {
       method: 'POST',
       headers: {
@@ -229,8 +232,6 @@ class Dashboard extends Component {
         'Authorization': `Bearer ${accessToken}`
       }
     });
-
-    this.socket.emit('leaveRoom', accessToken);
 
     this.setState({ activeRoom: '', chat: []});
   }

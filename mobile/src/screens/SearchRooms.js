@@ -21,10 +21,11 @@ class SearchRooms extends React.Component {
       accessToken: this.props.route.params.accessToken,
       rooms: [],
       tags: [],
-      roomCode: ""
+      roomCode: "",
+      searchError: ""
     }
 
-    this.client = new Client(process.env.SERVER_URL);
+    this.client = new Client('https://cop4331-chatapp.herokuapp.com');
 
     if (this.state.accessToken) {
       this.client.setAccessToken(this.state.accessToken);
@@ -34,15 +35,19 @@ class SearchRooms extends React.Component {
     }
 
     this.handleSearch = this.handleSearch.bind(this);
+    this.handleAddRoom = this.handleAddRoom.bind(this);
   }
 
   async handleSearch() {
-    const response = await this.client.search(this.state.tags);
+    const tags = this.state.tags;
+    if (tags.length === 0) {
+      return this.setState({searchError: "Please enter room tags to search for"});
+    }
+
+    const response = await this.client.search(tags);
     if (response.err) {
       return console.log(response.err);
     }
-
-    console.log(response);
 
     this.setState({rooms: response.rooms});
 
@@ -70,18 +75,19 @@ class SearchRooms extends React.Component {
                     ref={ref => { this._inputElement = ref }}
                     type="text" 
                     style={styles.inputText}
-                    label="roomTag"
-                    name="roomTag" 
-                    onChangeText={text => this.setState({tags:text.split(' ')})}
-                    placeholder="Room tags (Separate with spaces)"
+                    label="tags"
+                    name="tags" 
+                    onChangeText={text => this.setState({tags:[text]})}
+                    placeholder="Room tags"
                     placeholderTextColor="white"
                     enablesReturnKeyAutomatically={true}
                     keyboardAppearance="dark"
-                    id="roomTag" />
+                    id="tags" />
             </View>
+            <Text style={{color: "white"}}>{this.state.searchError}</Text>
             <TouchableOpacity 
                 style={styles.registerBtn}
-                onPress={this.handleSubmit} >
+                onPress={this.handleSearch} >
                 <Text 
                     style={styles.registerText}>Search
                 </Text>
@@ -99,7 +105,7 @@ class SearchRooms extends React.Component {
               <Card.Divider/>
               <Button
                 title='Add'
-                onPress={async () => await handleAddRoom(room._id)}
+                onPress={async () => await this.handleAddRoom(room._id)}
                 color="#5102A1"
               />
             </Card> 

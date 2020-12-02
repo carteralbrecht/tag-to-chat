@@ -8,22 +8,29 @@ import {
   ScrollView,
   View,
   Button,
-  Alert
+  Alert,
+  Modal,
+  TouchableOpacity,
+  TextInput
 } from "react-native";
 import { Card, Icon } from "react-native-elements";
 import Client from "../client.js";
 
 class Dashboard extends React.Component {
+  _isMounted = false;
+
   constructor(props) {
     super(props);
     this.state = {
       accessToken: this.props.route.params.accessToken,
       email: "",
       password: "",
-      rooms: []
+      rooms: [],
+      joinCodeOpen: false,
+      joinCode: ""
     };
 
-    this.client = new Client(process.env.SERVER_URL);
+    this.client = new Client('https://cop4331-chatapp.herokuapp.com');
 
     if (this.state.accessToken) {
       this.client.setAccessToken(this.state.accessToken);
@@ -40,7 +47,7 @@ class Dashboard extends React.Component {
     }
 
     const {profile, id: userId} = response.user;
-    this.setState({ profile, userId });
+    if (this._isMounted) this.setState({ profile, userId });
   }
 
   async updateRooms() {
@@ -49,7 +56,7 @@ class Dashboard extends React.Component {
       return console.log(response.err);
     }
 
-    this.setState({ rooms: response.rooms ? response.rooms : [] });
+    if (this._isMounted) this.setState({ rooms: response.rooms ? response.rooms : [] });
   }
 
   async updateInfo() {
@@ -80,13 +87,29 @@ class Dashboard extends React.Component {
   }
 
   async componentDidMount() {
-    await this.updateInfo();
-    this.props.navigation.addListener('focus', async () => await this.updateInfo());;
+    this._isMounted = true;
+
+    this.props.navigation.addListener('focus', async () => {
+      this._isMounted = true;
+      await this.updateInfo();
+    });
+
+    this.props.navigation.addListener('blur', async () => {
+      this._isMounted = false;
+    });
   }
 
   onContentSizeChange = (contentWidth, contentHeight) => {
-    this.setState({ screenHeight: contentHeight });
+    if (this._isMounted) this.setState({ screenHeight: contentHeight });
   };
+
+  showJoinCode(joinCode) {
+    this.setState({joinCode, joinCodeOpen: true});
+  }
+
+  hideJoinCode() {
+    this.setState({joinCode: '', joinCodeOpen: false});
+  }
 
   deleteConfirmation(roomId) {
     Alert.alert(
@@ -156,6 +179,12 @@ class Dashboard extends React.Component {
               />
 
               <Button
+                title='Show Room Code'
+                color="#5102A1"
+                onPress={() => this.showJoinCode(room.joinCode)}
+              />
+
+              <Button
                 title='Remove'
                 color="#5102A1"
                 onPress={() => this.deleteConfirmation(room._id)}
@@ -168,12 +197,62 @@ class Dashboard extends React.Component {
             </View>
           }
         </ScrollView>
+
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={this.state.joinCodeOpen}
+        >
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <Text style={styles.codeHeadText}>Room Code:</Text>
+                <Text selectable style={styles.codeText}>{this.state.joinCode}</Text>
+                <TouchableOpacity onPress={() => this.hideJoinCode()}>
+                  <Text style={styles.closeText}>Close</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+        </Modal>
       </View> 
     );
   }
 }
 
 const styles = StyleSheet.create({
+  centeredView: {
+    justifyContent: "center",
+    alignItems: "center",
+    flex: 1
+  },
+  modalView: {
+    width: "80%",
+    backgroundColor: "#303030",
+    borderRadius: 20,
+    padding: 20,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 5
+  },
+  codeHeadText: {
+    color: "white",
+    fontSize: 20,
+  },
+  codeText: {
+    color: "white",
+    fontSize: 14,
+    marginTop: 20
+  },
+  closeText: {
+    color: "white",
+    fontSize: 20,
+    marginTop: 20
+  },
   statusbar: {
     backgroundColor: "#5102A1",
     height: 34

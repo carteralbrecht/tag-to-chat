@@ -23,7 +23,7 @@ class MessageScreen extends React.Component {
       chat: [],
     };
 
-    this.client = new Client(process.env.SERVER_URL);
+    this.client = new Client('https://cop4331-chatapp.herokuapp.com');
 
     if (this.state.accessToken) {
       this.client.setAccessToken(this.state.accessToken);
@@ -34,36 +34,25 @@ class MessageScreen extends React.Component {
   }
 
   async componentDidMount() {
-    this.props.navigation.addListener('focus', async () => {
-      // Socket stuff
-      this.socket = io(process.env.SERVER_URL);
+    this.socket = io('https://cop4331-chatapp.herokuapp.com');
 
-      this.socket.on('connect', async () => {
-        if (this.state.room) {
-          await this.handleJoinRoom(this.state.room);
-        } else {
-          this.props.navigation.navigate('Login');
-        }
-      });
-
-      this.socket.on('messageError', (err) => {
-        alert('error sending message');
-        console.log(err);
-      });
-
-      // Update the chat if a new message is broadcasted.
-      this.socket.on('push', (msg) => {
-        this.setState((state) => ({
-          chat: [...state.chat, msg],
-        }));
-      });
+    this.socket.on('connect', async () => {
+      if (this.state.room) {
+        await this.handleJoinRoom(this.state.room);
+      } else {
+        this.props.navigation.navigate('Login');
+      }
     });
 
-    this.props.navigation.addListener('blur', async () => {
-      if (this.state.activeRoom) {
-        this.socket.disconnect();
-        await this.handleLeaveRoom(this.state.activeRoom);
-      }
+    this.socket.on('messageError', (err) => {
+      console.log(err);
+    });
+
+    // Update the chat if a new message is broadcasted.
+    this.socket.on('push', (msg) => {
+      this.setState((state) => ({
+        chat: [...state.chat, msg],
+      }));
     });
   }
 
@@ -125,13 +114,13 @@ class MessageScreen extends React.Component {
           <Button
             title="Back"
             color="#fff"
-            onPress={async () => await this.handleLeaveRoom() }
+            onPress={async () => await this.handleLeaveRoom()}
           />
           <Header title={this.state.name}/>
           <Button
             title="Log Out"
             color="#fff"
-            onPress={() => this.props.navigation.navigate("Login") }
+            onPress={() => this.props.navigation.navigate("Login")}
           />
         </View>
         <AutoScrollFlatList

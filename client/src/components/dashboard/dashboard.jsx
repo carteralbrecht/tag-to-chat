@@ -32,6 +32,9 @@ import './dashboard.css';
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Chat from "../chat/chat";
 import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent";
+import CardActions from "@material-ui/core/CardActions";
+import CardHeader from "@material-ui/core/CardHeader";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="down" ref={ref} {...props} />;
@@ -132,6 +135,8 @@ class Dashboard extends Component {
       profileOpen: false,
       searchOpen: false,
       createRoomOpen: false,
+      removeConfirmOpen: false,
+      roomToRemove: ''
     }
 
     this.checkUser = this.checkUser.bind(this);
@@ -145,6 +150,9 @@ class Dashboard extends Component {
 
     this.handleChatOpen = this.handleChatOpen.bind(this);
     this.handleChatClose = this.handleChatClose.bind(this);
+
+    this.handleRemoveConfirmOpen = this.handleRemoveConfirmOpen.bind(this);
+    this.handleRemoveConfirmClose = this.handleRemoveConfirmClose.bind(this);
 
     this.handleSearchOpen = this.handleSearchOpen.bind(this);
     this.handleSearchClose = this.handleSearchClose.bind(this);
@@ -336,6 +344,11 @@ class Dashboard extends Component {
     });
   }
 
+  async handleRemoveRoom() {
+    console.log("Removing Room...");
+    this.setState({roomToRemove: ''});
+  }
+
   async handleSubmit(event) {
     // Prevent the form to reload the current page.
     event.preventDefault();
@@ -382,6 +395,17 @@ class Dashboard extends Component {
 
   handleCreateRoomOpen = () => this.setState({createRoomOpen: true});
   handleCreateRoomClose = () => this.setState({createRoomOpen: false});
+
+  handleRemoveConfirmOpen = function(roomId) {
+    this.setState({roomToRemove: roomId});
+    this.setState({removeConfirmOpen: true});
+
+  };
+
+  handleRemoveConfirmClose = function() {
+    this.setState({removeConfirmOpen: false});
+    this.setState({roomToRemove: ''})
+  };
 
   handleChatOpen = () => this.setState({ chatOpen: true });
 
@@ -454,31 +478,67 @@ class Dashboard extends Component {
             <AddIcon display="inline" style={{fontSize: '4rem'}} />
             </IconButton>
           </Grid>
-              <Grid container spacing={5} justify="center" align="center">
+              <Grid container
+                    spacing={5}
+                    style={{margin: '2rem', height: "100%", justifyContent: "center"}}
+                    direction="row"
+                    justify="center"
+                    alignItems="center">
                 {this.state.rooms.map((room) => (
-                    <Grid item xs={6} sm={3}>
-                        <Paper>
-                          <Typography>{room.name}</Typography>
+                    <Grid item xs={6} sm={3} >
+                      <Card>
+                        <CardHeader
+                            title={room.name}
+                            titleTypographyProps={{variant:'h6' }}
+                            style={{ textAlign: "center" }}
+                        >
+                        </CardHeader>
+                        <CardActions style={{ justifyContent: "center" }}>
                           <Button
-                            variant="contained"
-                            color="primary"
-                            type="button"
-                            onClick={() => this.handleJoinRoom(room._id)}
-                            >
+                              variant="contained"
+                              color="primary"
+                              type="button"
+                              onClick={() => this.handleJoinRoom(room._id)}
+                          >
                             Join
                           </Button>
                           <Button
-                            variant = "contained"
-                            style={{backgroundColor: "#E83F1B", color: "white"}}
-                            type="button"
-                            >
+                              variant = "contained"
+                              style={{backgroundColor: "#E83F1B", color: "white"}}
+                              type="button"
+                              onClick={() => this.handleRemoveConfirmOpen(room._id)}
+                          >
                             Remove
                           </Button>
-                      </Paper>
+                        </CardActions>
+                      </Card>
                     </Grid>
                 ))}
               </Grid>
         </Grid>
+        <Dialog open={this.state.removeConfirmOpen} onClose={this.handleRemoveConfirmClose} aria-labelledby="form-dialog-title">
+          <DialogContent style={{ justifyContent: "center" }}>
+            <Typography>Are you sure you want to remove?</Typography>
+          </DialogContent>
+          <DialogActions style={{ justifyContent: "center" }}>
+            <Button
+                variant="contained"
+                color="primary"
+                type="button"
+                style={{backgroundColor: "#e83f1b", color: "white"}}
+                onClick={() => this.handleRemoveConfirmClose()}
+            >
+              Cancel
+            </Button>
+            <Button
+                variant = "contained"
+                type="button"
+                onClick={() => this.handleRemoveRoom()}
+            >
+              Yes
+            </Button>
+          </DialogActions>
+        </Dialog>
 
         <Dialog open={this.state.profileOpen} onClose={this.handleProfileClose} aria-labelledby="form-dialog-title">
           <DialogTitle id="form-dialog-title">

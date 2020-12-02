@@ -639,7 +639,6 @@ class Dashboard extends Component {
               Create a Room
             </DialogContentText>
             <TextField
-                autoFocus
                 margin="dense"
                 name="name"
                 label="Room Name"
@@ -649,7 +648,6 @@ class Dashboard extends Component {
                 fullWidth
             />
             <TextField
-                autoFocus
                 margin="dense"
                 name="tags"
                 label="Room Tags"

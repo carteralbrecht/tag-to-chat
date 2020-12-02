@@ -18,11 +18,13 @@ class CreateRoom extends React.Component {
           accessToken: this.props.route.params.accessToken,
           name: "",
           tags: "",
-          roomCode: "",
-          private: true
+          joinCode: "",
+          private: true,
+          addError: "",
+          createError: ""
         };
 
-        this.client = new Client(process.env.SERVER_URL);
+        this.client = new Client('https://cop4331-chatapp.herokuapp.com');
 
         if (this.state.accessToken) {
           this.client.setAccessToken(this.state.accessToken);
@@ -39,9 +41,9 @@ class CreateRoom extends React.Component {
       event.preventDefault();
 
       if (this.validateAdd()) {
-        const response = await this.client.addRoomCode(this.state.roomCode);
+        const response = await this.client.addJoinCode(this.state.joinCode);
         if (response.err) {
-          return console.log(response.err);
+          return this.setState({addError: "Error adding room"});
         }
 
         this.props.navigation.navigate('Dashboard');
@@ -54,7 +56,7 @@ class CreateRoom extends React.Component {
         if(this.validateCreate()){
           const response = await this.client.createRoom(this.state);
           if (response.err) {
-            return console.log(response.err);
+            return this.setState({createError: "Error creating room"});
           }
 
           this.props.navigation.navigate('Dashboard');
@@ -62,20 +64,25 @@ class CreateRoom extends React.Component {
     }
 
     validateAdd(){
-      return this.state.roomCode !== "";
-  }
+      let isValid = true;
+      if (this.state.joinCode === "") {
+        isValid = false;
+        this.setState({addError: "Please enter a room code"});
+      }
+      return isValid;
+    }
 
     validateCreate(){
         let isValid = true; 
     
-        if (this.state.name == "") {
+        if (this.state.name === "") {
           isValid = false;
-          alert("Please enter a name for your room");
+          this.setState({createError: "Please enter a name for your room"});
         }
     
-        if (this.state.tags == "") {
+        if (this.state.tags === "") {
           isValid = false;
-          alert("Please enter at least one room tag");
+          this.setState({createError: "Please enter at least one room tag"});
         } 
     
         return isValid;
@@ -90,15 +97,16 @@ class CreateRoom extends React.Component {
             <TextInput 
               type="text" 
               style={styles.inputText}
-              label="roomCode"
-              name="roomCode" 
-              onChangeText={text => this.setState({roomCode:text})}
+              label="joinCode"
+              name="joinCode" 
+              onChangeText={text => this.setState({joinCode:text})}
               placeholder="Join room using invite code"
               placeholderTextColor="white"
               enablesReturnKeyAutomatically={true}
               keyboardAppearance="dark"
-              id="roomCode" />
+              id="joinCode" />
           </View>
+          <Text style={{color: "white"}}>{this.state.addError}</Text>
           <TouchableOpacity 
             style={styles.addBtn}
             onPress={this.handleAddRoom}
@@ -129,7 +137,7 @@ class CreateRoom extends React.Component {
                   label="roomTags"
                   name="roomTags" 
                   onChangeText={text => this.setState({tags:text.split(' ')})}
-                  placeholder="Room tags (Separate with spaces)"
+                  placeholder="Room tags"
                   placeholderTextColor="white"
                   enablesReturnKeyAutomatically
                   keyboardAppearance="dark" 
@@ -147,6 +155,7 @@ class CreateRoom extends React.Component {
                   onPress={() => this.setState({private: !this.state.private})}
               />
           </View>
+          <Text style={{color: "white"}}>{this.state.createError}</Text>
           <TouchableOpacity 
             style={styles.registerBtn}
             onPress={this.handleCreateRoom}

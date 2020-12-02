@@ -100,54 +100,6 @@ router.post('/create', authenticateUser, async (req, res) => {
 });
 
 /*
-    - Gets room join code
-    - Called by room owner
-*/
-router.get('/code/:roomId', authenticateUser, async (req, res) => {
-  const roomId = req.params.roomId;
-  const userId = res.locals.claims.userId;
-
-  const roomsOwned = await getRoomsOwned(userId);
-
-  // Check user claims before executing transaction
-  if (!roomsOwned || !roomsOwned.includes(roomId)) return res.sendStatus(403);
-  let room;
-  try {
-    room = await Room.findById(roomId);
-  } catch (err) {
-    return res.status(500).send(err);
-  }
-
-  return res.status(200).json({joinCode: room.joinCode});
-});
-
-/*
-    - Resets room join code and returns it
-    - Called by room owner
-*/
-router.post('/code/:roomId', authenticateUser, async (req, res) => {
-  const roomId = req.params.roomId;
-  const userId = res.locals.claims.userId;
-
-  const roomsOwned = await getRoomsOwned(userId);
-
-  // Check user claims before executing transaction
-  if (!roomsOwned || !roomsOwned.includes(roomId)) return res.sendStatus(403);
-
-  const conditions = {_id: roomId};
-  const update = {$set: {'joinCode': uuidv4()}};
-
-  let room;
-  try {
-    room = await Room.findOneAndUpdate(conditions, update, {new: true});
-  } catch (err) {
-    return res.status(500).send(err);
-  }
-
-  return res.status(200).json({joinCode: room.joinCode});
-});
-
-/*
     - Delete room
     - Called by room owner
 */
@@ -350,7 +302,7 @@ router.post('/add', authenticateUser, async (req, res) => {
 
   if (!user.profile.roomsAdded) user.profile.roomsAdded = [];
 
-  user.profile.roomsAdded.push(roomId);
+  user.profile.roomsAdded.push(room._id);
   await user.update();
 
   return res.sendStatus(200);

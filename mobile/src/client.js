@@ -119,6 +119,7 @@ class Client {
         }
 
         const rooms = await response.json();
+        console.log('rooms client api: ', rooms);
         return {rooms};
     }
 
@@ -189,10 +190,10 @@ class Client {
         return {};
     }
 
-    async addRoomCode(joinCode) {
+    async addJoinCode(joinCode) {
         let response;
         try {
-            response = await fetch(`${this.addRoomUrl}`, {
+            response = await fetch(this.addRoomUrl, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',

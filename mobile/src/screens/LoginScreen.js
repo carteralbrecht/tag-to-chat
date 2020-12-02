@@ -18,10 +18,11 @@ class LoginScreen extends React.Component {
       username: "",
       password: "",
       forgotOpen: false,
-      forgotErr: ""
+      forgotErr: "",
+      loginErr: ""
     };
 
-    this.client = new Client(process.env.SERVER_URL);
+    this.client = new Client('https://cop4331-chatapp.herokuapp.com');
 
     this.handleForgot = this.handleForgot.bind(this);
   }
@@ -33,7 +34,7 @@ class LoginScreen extends React.Component {
   async handleForgot() {
     const response = await this.client.forgot(this.state);
     if (response.err) {
-      return console.log(response.err);
+      return this.setState({forgotErr: "Error sending reset email"});
     }
 
     this.handleForgotToggle();
@@ -41,23 +42,23 @@ class LoginScreen extends React.Component {
 
   async login() {
     if (this.state.email == "") {
-      return alert("Please enter your email");
+      return this.setState({loginErr: "Please enter your email"});
     }
 
     if (this.state.password == "") {
-      return alert("Please enter your password");
+      return this.setState({loginErr: "Please enter your password"});
     }
 
     let response = await this.client.signIn(this.state);
     if (response.err) {
-      return console.log('Error signing in user: ', response.err);
+      return this.setState({loginErr: "Error logging in"});
     }
 
     const sessionToken = response.sessionToken;
 
     response = await this.client.generateAccessToken(sessionToken);
     if (response.err) {
-      return console.log('Error getting access token: ', response.err);
+      return this.setState({loginErr: "Error authenticating session"});
     }
 
     const accessToken = response.accessToken;

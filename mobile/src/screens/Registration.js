@@ -18,7 +18,7 @@ class Reg extends React.Component {
       statusText: ""
     };
 
-    this.client = new Client(process.env.SERVER_URL);
+    this.client = new Client('https://cop4331-chatapp.herokuapp.com');
 
     this.handleSubmit = this.handleSubmit.bind(this);
   }

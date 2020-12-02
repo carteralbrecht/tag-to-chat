@@ -25,7 +25,7 @@ class UpdateUser extends React.Component {
       lastName
     };
 
-    this.client = new Client(process.env.SERVER_URL);
+    this.client = new Client('https://cop4331-chatapp.herokuapp.com');
 
     if (this.state.accessToken) {
       this.client.setAccessToken(this.state.accessToken);

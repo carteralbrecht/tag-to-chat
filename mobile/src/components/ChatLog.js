@@ -98,6 +98,8 @@ const styles = StyleSheet.create({
     maxHeight: 200,
     overflow: "hidden",
     marginTop: 10,
+    alignSelf: "flex-start",
+    alignItems: "flex-start"
   },
 
   chatTextSelf: {

@@ -130,7 +130,11 @@ class Dashboard extends Component {
       queryResults: [],
       rooms: [],
       userInfo: {},
-      createRoomInfo: {},
+      createRoomInfo: {
+        privateChecked: false,
+        tags: [],
+        name: ''
+      },
       chatOpen: false,
       profileOpen: false,
       searchOpen: false,
@@ -163,6 +167,8 @@ class Dashboard extends Component {
 
     this.handleCreateRoom = this.handleCreateRoom.bind(this);
     this.handleCreateRoomChange = this.handleCreateRoomChange.bind(this);
+
+    this.handlePrivateCheckboxChange = this.handlePrivateCheckboxChange.bind(this);
   }
 
   async checkUser() {
@@ -641,6 +647,7 @@ class Dashboard extends Component {
               control ={
                 <Checkbox
                     checked={this.state.createRoomInfo.privateChecked}
+                    onChange={this.handlePrivateCheckboxChange}
                     name="privateChecked"
                     color="primary"
                 />
@@ -652,7 +659,11 @@ class Dashboard extends Component {
             <Button onClick={this.handleCreateRoomClose} color="secondary">
               Cancel
             </Button>
-            <Button onClick={this.handleCreateRoom} color="primary">
+            <Button onClick={() => {
+              this.handleCreateRoom()
+                  .then(r => this.updateRooms())
+                  .then(r => this.handleCreateRoomClose());
+            }}>
               Create
             </Button>
           </DialogActions>

@@ -28,6 +28,7 @@ console.log("process.env.PORT is: " + process.env.PORT);
 console.log("port is " + port);
 
 const mongoose = require('mongoose');
+const MessageSchema = require('./models/Message');
 const Room = require('./models/Room');
 
 const usersRouter = require('./api/routes/users');
@@ -61,6 +62,12 @@ io.on('connection', (socket) => {
     const {roomActive, nickName, email} = user.profile;
 
     socket.join(roomActive);
+
+    const room = await Room.findOne({_id: roomActive}, {messages: {$slice: -10}}).exec();
+    const messages = room.messages;
+
+    socket.emit('joinRoomInit', messages);
+
     io.to(roomActive).emit('push', {
       name: 'Server',
       content: `${nickName ? nickName : email} has joined the room`
@@ -92,12 +99,11 @@ io.on('connection', (socket) => {
 
     const conditions = {'_id': roomActive};
 
-    // TODO: XSS protection
-
     const newMessage = {
       userId,
       content,
-      name: nickName ? nickName : email
+      name: nickName ? nickName : email,
+      sentAt: Date.now()
     };
 
     const update = {
@@ -105,12 +111,6 @@ io.on('connection', (socket) => {
         messages: newMessage,
       },
     };
-
-    /*
-      TODO: 
-        1. Pull max of 'x' messages
-        2. Remove join code from resposne
-    */
 
     let room;
     try {

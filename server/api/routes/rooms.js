@@ -34,7 +34,7 @@ router.post('/tags', authenticateUser, async (req, res) => {
   const userId = res.locals.claims.userId;
   const tagsLookingFor = arrayToLower(req.body.tags);
 
-  const conditions = {tags: {$in: tagsLookingFor}, 'users.userId': {$ne: userId}};
+  const conditions = {tags: {$in: tagsLookingFor}, 'users.userId': {$ne: userId}, private: false};
 
   Room.find(conditions).exec((err, rooms) => {
     if (err) {
@@ -53,7 +53,7 @@ router.post('/create', authenticateUser, async (req, res) => {
   if (!req.body) return res.sendStatus(400);
 
   const name = req.body.name;
-  const private = req.body.private;
+  const isPrivate = req.body.private;
   const tags = req.body.tags;
 
   const userId = res.locals.claims.userId;
@@ -67,7 +67,7 @@ router.post('/create', authenticateUser, async (req, res) => {
   const roomToCreate = new Room({
     name,
     ownerId: user.id,
-    private,
+    private: isPrivate,
     joinCode: uuidv4(),
     users: [],
     messages: [],

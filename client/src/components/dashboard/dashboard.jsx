@@ -218,22 +218,13 @@ class Dashboard extends Component {
     await this.updateRooms();
 
     this.socket = io(config[process.env.NODE_ENV].endpoint);
-
-    this.socket.on('messageError', (err) => {
-      alert('error sending message');
-      console.log(err);
-    });
-
-    // Update the chat if a new message is broadcasted.
-    this.socket.on('push', (msg) => {
-      this.setState((state) => ({
-        chat: [...state.chat, msg],
-      }), this.scrollToBottom);
-    });
   }
 
   async handleLeaveRoom(roomId) {
     const accessToken = await this.props.authService.getAccessToken();
+
+    this.socket.emit('leaveRoom', accessToken);
+
     const response = await fetch(`/api/rooms/leave/${roomId}`, {
       method: 'POST',
       headers: {
@@ -242,19 +233,13 @@ class Dashboard extends Component {
       }
     });
 
-    //const room = await response.json();
-    //console.log(room);
-
-    this.socket.emit('leaveRoom', accessToken);
-
     this.setState({ activeRoom: '', chat: []});
-
-    console.log('Leave room successful');
   }
 
   async handleCreateRoom() {
     const nameOfRoom = this.state.createRoomInfo.name;
     const tags = [];
+    const isPrivate = this.state.createRoomInfo.privateChecked;
     tags.push(this.state.createRoomInfo.tags);
     const accessToken = await this.props.authService.getAccessToken();
     const response = await fetch(`/api/rooms/create`, {
@@ -264,7 +249,7 @@ class Dashboard extends Component {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${accessToken}`
       },
-      body: JSON.stringify({name: nameOfRoom, tags: tags})
+      body: JSON.stringify({name: nameOfRoom, tags: tags, private: isPrivate})
     });
 
     await this.updateRooms();
@@ -286,20 +271,8 @@ class Dashboard extends Component {
       }
     });
 
-    //const room = await response.json();
-    //console.log(room);
-
     this.socket.emit('joinRoom', accessToken);
-
     this.setState({ activeRoom: roomId });
-
-    console.log('Join room successful');
-
-    // const messages = room.messages;
-    // this.setState((state) => ({
-    //   chat: [...state.chat, ...messages],
-    // }), this.scrollToBottom);
-
     this.handleChatOpen()
   }
 
@@ -414,7 +387,6 @@ class Dashboard extends Component {
     this.setState({chatOpen: false});
     this.handleLeaveRoom(this.state.activeRoom);
   }
-  handleChatClose = () => this.setState({ chatOpen: false });
 
   handleSearchOpen = () => this.setState({ searchOpen: true });
   handleSearchClose = () => {
@@ -619,7 +591,11 @@ class Dashboard extends Component {
                       variant="contained"
                       color="primary"
                       type="button"
-                      onClick={() => this.handleAddRoom(room._id)}
+                      onClick={() => {
+                        this.handleAddRoom(room._id)
+                            .then(r => this.updateRooms())
+                            .then(r => this.handleSearchClose());
+                      }}
                       >
                       Add Room
                     </Button>
@@ -695,7 +671,10 @@ class Dashboard extends Component {
               </IconButton>
             </Toolbar>
           </AppBar>
-          <Chat />
+          <Chat
+            socket={this.socket}
+            nickname={this.state.userInfo.nickName}
+          />
         </Dialog>
       </MuiThemeProvider>
     );

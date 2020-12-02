@@ -218,18 +218,6 @@ class Dashboard extends Component {
     await this.updateRooms();
 
     this.socket = io(config[process.env.NODE_ENV].endpoint);
-
-    this.socket.on('messageError', (err) => {
-      alert('error sending message');
-      console.log(err);
-    });
-
-    // Update the chat if a new message is broadcasted.
-    this.socket.on('push', (msg) => {
-      this.setState((state) => ({
-        chat: [...state.chat, msg],
-      }), this.scrollToBottom);
-    });
   }
 
   async handleLeaveRoom(roomId) {
@@ -242,14 +230,9 @@ class Dashboard extends Component {
       }
     });
 
-    //const room = await response.json();
-    //console.log(room);
-
     this.socket.emit('leaveRoom', accessToken);
 
     this.setState({ activeRoom: '', chat: []});
-
-    console.log('Leave room successful');
   }
 
   async handleCreateRoom() {
@@ -287,20 +270,8 @@ class Dashboard extends Component {
       }
     });
 
-    //const room = await response.json();
-    //console.log(room);
-
     this.socket.emit('joinRoom', accessToken);
-
     this.setState({ activeRoom: roomId });
-
-    console.log('Join room successful');
-
-    // const messages = room.messages;
-    // this.setState((state) => ({
-    //   chat: [...state.chat, ...messages],
-    // }), this.scrollToBottom);
-
     this.handleChatOpen()
   }
 
@@ -415,7 +386,6 @@ class Dashboard extends Component {
     this.setState({chatOpen: false});
     this.handleLeaveRoom(this.state.activeRoom);
   }
-  handleChatClose = () => this.setState({ chatOpen: false });
 
   handleSearchOpen = () => this.setState({ searchOpen: true });
   handleSearchClose = () => {

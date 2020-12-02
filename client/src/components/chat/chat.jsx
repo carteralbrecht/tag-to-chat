@@ -73,13 +73,6 @@ class Chat extends Component {
   render() {
     return (
       <div>
-        <AppBar>
-          <Toolbar>
-            <IconButton edge="end" color="inherit" onClick={this.handleChatClose}>
-              <CloseIcon />
-            </IconButton>
-          </Toolbar>
-        </AppBar>
             <div className="Chat">
               <Paper id="chat" elevation={3}>
                 {this.state.chat.map((el, index) => {

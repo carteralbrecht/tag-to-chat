@@ -15,7 +15,7 @@ const validateToken = require('./api/lib/validateToken');
 const oktaClient = require('./api/lib/oktaClient');
 
 const uri = process.env.MONGODB_URI;
-const port = process.env.PORT || 5000;
+const port = 5000;
 
 console.log("process.env.PORT is: " + process.env.PORT);
 console.log("port is " + port);

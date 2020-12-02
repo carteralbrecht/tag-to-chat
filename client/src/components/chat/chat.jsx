@@ -4,10 +4,11 @@ import io from 'socket.io-client';
 
 import { withOktaAuth } from '@okta/okta-react';
 
-import {Grid, Paper, Typography, Button} from '@material-ui/core';
+import {Grid, Paper, Typography, Button, Toolbar, IconButton, AppBar} from '@material-ui/core';
 
 import BottomBar from './bottomBar';
 import './chat.css';
+import CloseIcon from "@material-ui/icons/Close";
 
 async function checkUser() {
   if (this.props.authState.isAuthenticated) {
@@ -26,8 +27,8 @@ async function updateRooms() {
     }
   });
 
-  const rooms = await response.json();
-  this.setState({ rooms })
+  //const rooms = await response.json();
+  //this.setState({ rooms })
 }
 
 class Chat extends Component {
@@ -85,8 +86,8 @@ class Chat extends Component {
       }
     });
 
-    const room = await response.json();
-    console.log(room);
+    //const room = await response.json();
+    //console.log(room);
 
     alert('Join room successful');
   }
@@ -129,6 +130,13 @@ class Chat extends Component {
   render() {
     return (
       <div>
+        <AppBar>
+          <Toolbar>
+            <IconButton edge="end" color="inherit" onClick={this.handleChatClose}>
+              <CloseIcon />
+            </IconButton>
+          </Toolbar>
+        </AppBar>
             <div className="Chat">
               <Paper id="chat" elevation={3}>
                 {this.state.chat.map((el, index) => {

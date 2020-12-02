@@ -57,25 +57,15 @@ class SignInForm extends Component {
 
   async handleSubmit(e) {
     e.preventDefault();
-
-    let response = await fetch('/api/users/login', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(this.state)
-    });
-
-    let body = await response.json();
-
-    if (response.status !== 200) {
+    let response;
+    try {
+      response = await this.oktaAuth.signIn({username: this.state.username, password: this.state.password});
+    } catch (err) {
       return this.setState({ error: 'Error logging in' });
     }
 
-    const sessionToken = body.sessionToken;
+    const sessionToken = response.sessionToken;
     this.setState({ sessionToken });
-
     this.props.authService.redirect({ sessionToken });
   }
 

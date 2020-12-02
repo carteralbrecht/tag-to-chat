@@ -24,6 +24,9 @@ const oktaClient = require('./api/lib/oktaClient');
 const uri = process.env.MONGODB_URI;
 const port = process.env.PORT || 5000;
 
+console.log("process.env.PORT is: " + process.env.PORT);
+console.log("port is " + port);
+
 const mongoose = require('mongoose');
 const Room = require('./models/Room');
 
@@ -40,6 +43,10 @@ app.use(limiter);
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'client', 'build')));
+
+app.get(['/', '/dashboard', '/login', '/login/callback', '/register'], function (req, res) {
+  res.sendFile(path.join(__dirname, '..', 'client', 'build', 'index.html'));
+});
 
 app.use('/api/users', usersRouter);
 app.use('/api/rooms', roomsRouter);

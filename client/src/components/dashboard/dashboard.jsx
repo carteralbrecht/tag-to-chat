@@ -255,6 +255,7 @@ class Dashboard extends Component {
   async handleCreateRoom() {
     const nameOfRoom = this.state.createRoomInfo.name;
     const tags = [];
+    const isPrivate = this.state.createRoomInfo.privateChecked;
     tags.push(this.state.createRoomInfo.tags);
     const accessToken = await this.props.authService.getAccessToken();
     const response = await fetch(`/api/rooms/create`, {
@@ -264,7 +265,7 @@ class Dashboard extends Component {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${accessToken}`
       },
-      body: JSON.stringify({name: nameOfRoom, tags: tags})
+      body: JSON.stringify({name: nameOfRoom, tags: tags, private: isPrivate})
     });
 
     await this.updateRooms();
@@ -619,7 +620,11 @@ class Dashboard extends Component {
                       variant="contained"
                       color="primary"
                       type="button"
-                      onClick={() => this.handleAddRoom(room._id)}
+                      onClick={() => {
+                        this.handleAddRoom(room._id)
+                            .then(r => this.updateRooms())
+                            .then(r => this.handleSearchClose());
+                      }}
                       >
                       Add Room
                     </Button>
@@ -695,7 +700,10 @@ class Dashboard extends Component {
               </IconButton>
             </Toolbar>
           </AppBar>
-          <Chat />
+          <Chat
+            socket={this.socket}
+            nickname={this.state.userInfo.nickName}
+          />
         </Dialog>
       </MuiThemeProvider>
     );

@@ -17,7 +17,8 @@ const oktaClient = require('./api/lib/oktaClient');
 const uri = process.env.MONGODB_URI;
 const port = process.env.PORT || 5000;
 
-console.log(port);
+console.log("process.env.PORT is: " + process.env.PORT);
+console.log("port is " + port);
 
 const mongoose = require('mongoose');
 const Room = require('./models/Room');

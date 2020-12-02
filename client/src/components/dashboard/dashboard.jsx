@@ -130,7 +130,11 @@ class Dashboard extends Component {
       queryResults: [],
       rooms: [],
       userInfo: {},
-      createRoomInfo: {},
+      createRoomInfo: {
+        privateChecked: false,
+        tags: [],
+        name: ''
+      },
       chatOpen: false,
       profileOpen: false,
       searchOpen: false,
@@ -163,6 +167,8 @@ class Dashboard extends Component {
 
     this.handleCreateRoom = this.handleCreateRoom.bind(this);
     this.handleCreateRoomChange = this.handleCreateRoomChange.bind(this);
+
+    this.handlePrivateCheckboxChange = this.handlePrivateCheckboxChange.bind(this);
   }
 
   async checkUser() {
@@ -318,7 +324,18 @@ class Dashboard extends Component {
   }
 
   async handleRemoveRoom() {
-    console.log("Removing Room...");
+    const roomToRemove = this.state.roomToRemove;
+    const accessToken = await this.props.authService.getAccessToken();
+    const response = await fetch(`/api/rooms/remove/${roomToRemove}`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+
+    await this.updateRooms();
     this.setState({roomToRemove: ''});
   }
 
@@ -505,7 +522,11 @@ class Dashboard extends Component {
             <Button
                 variant = "contained"
                 type="button"
-                onClick={() => this.handleRemoveRoom()}
+                onClick={() => {
+                  this.handleRemoveRoom()
+                      .then(r => this.handleRemoveConfirmClose())
+                      .then(r => this.updateRooms());
+                }}
             >
               Yes
             </Button>
@@ -618,7 +639,6 @@ class Dashboard extends Component {
               Create a Room
             </DialogContentText>
             <TextField
-                autoFocus
                 margin="dense"
                 name="name"
                 label="Room Name"
@@ -628,7 +648,6 @@ class Dashboard extends Component {
                 fullWidth
             />
             <TextField
-                autoFocus
                 margin="dense"
                 name="tags"
                 label="Room Tags"
@@ -641,6 +660,7 @@ class Dashboard extends Component {
               control ={
                 <Checkbox
                     checked={this.state.createRoomInfo.privateChecked}
+                    onChange={this.handlePrivateCheckboxChange}
                     name="privateChecked"
                     color="primary"
                 />
@@ -652,7 +672,11 @@ class Dashboard extends Component {
             <Button onClick={this.handleCreateRoomClose} color="secondary">
               Cancel
             </Button>
-            <Button onClick={this.handleCreateRoom} color="primary">
+            <Button onClick={() => {
+              this.handleCreateRoom()
+                  .then(r => this.updateRooms())
+                  .then(r => this.handleCreateRoomClose());
+            }}>
               Create
             </Button>
           </DialogActions>

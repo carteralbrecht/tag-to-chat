@@ -324,7 +324,18 @@ class Dashboard extends Component {
   }
 
   async handleRemoveRoom() {
-    console.log("Removing Room...");
+    const roomToRemove = this.state.roomToRemove;
+    const accessToken = await this.props.authService.getAccessToken();
+    const response = await fetch(`/api/rooms/remove/${roomToRemove}`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+
+    await this.updateRooms();
     this.setState({roomToRemove: ''});
   }
 
@@ -511,7 +522,11 @@ class Dashboard extends Component {
             <Button
                 variant = "contained"
                 type="button"
-                onClick={() => this.handleRemoveRoom()}
+                onClick={() => {
+                  this.handleRemoveRoom()
+                      .then(r => this.handleRemoveConfirmClose())
+                      .then(r => this.updateRooms());
+                }}
             >
               Yes
             </Button>

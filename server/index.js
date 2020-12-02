@@ -2,7 +2,14 @@ const express = require('express');
 const app = express();
 const server = require('http').createServer(app);
 const path = require('path');
-const io = require('socket.io')(server);
+const io = require('socket.io')(server, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+    allowedHeaders: ["*/*"],
+    credentials: true,
+  }
+});
 
 // Limit an IP to 100 requests per 5 mintues
 const rateLimit = require('express-rate-limit');

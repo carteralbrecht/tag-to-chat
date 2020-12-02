@@ -39,6 +39,16 @@ class Chat extends Component {
         chat: [...state.chat, msg],
       }), this.scrollToBottom);
     });
+
+    // Load the last 10 messages in the window.
+    this.props.socket.on('joinRoomInit', (msg) => {
+      let msgReversed = msg.reverse();
+      this.setState((state) => ({
+        chat: [...state.chat, ...msgReversed],
+      }), this.scrollToBottom);
+    });
+
+
   }
 
   // Save the message the user is typing in the input field.

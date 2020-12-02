@@ -130,7 +130,7 @@ class Chat extends Component {
     return (
       <div>
             <div className="Chat">
-              <Paper id="chat" elevation={3}>
+              <Paper id="chat" elevation={0}>
                 {this.state.chat.map((el, index) => {
                   return (
                     <div key={index}>
@@ -144,6 +144,12 @@ class Chat extends Component {
                   );
                 })}
               </Paper>
+              <BottomBar
+                content={this.state.content}
+                handleContent={this.handleContent.bind(this)}
+                handleSubmit={this.handleSubmit.bind(this)}
+                nickname={this.state.nickname}
+              />
             </div>
       </div>
     );

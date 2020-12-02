@@ -234,8 +234,8 @@ class Dashboard extends Component {
       }
     });
 
-    const room = await response.json();
-    console.log(room);
+    //const room = await response.json();
+    //console.log(room);
 
     this.socket.emit('leaveRoom', accessToken);
 
@@ -278,8 +278,8 @@ class Dashboard extends Component {
       }
     });
 
-    const room = await response.json();
-    console.log(room);
+    //const room = await response.json();
+    //console.log(room);
 
     this.socket.emit('joinRoom', accessToken);
 
@@ -287,10 +287,10 @@ class Dashboard extends Component {
 
     console.log('Join room successful');
 
-    const messages = room.messages;
-    this.setState((state) => ({
-      chat: [...state.chat, ...messages],
-    }), this.scrollToBottom);
+    // const messages = room.messages;
+    // this.setState((state) => ({
+    //   chat: [...state.chat, ...messages],
+    // }), this.scrollToBottom);
 
     this.handleChatOpen()
   }
@@ -384,6 +384,12 @@ class Dashboard extends Component {
   handleCreateRoomClose = () => this.setState({createRoomOpen: false});
 
   handleChatOpen = () => this.setState({ chatOpen: true });
+
+  handleChatClose = function()
+  {
+    this.setState({chatOpen: false});
+    this.handleLeaveRoom(this.state.activeRoom);
+  }
   handleChatClose = () => this.setState({ chatOpen: false });
 
   handleSearchOpen = () => this.setState({ searchOpen: true });

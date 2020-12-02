@@ -144,6 +144,12 @@ class Chat extends Component {
                   );
                 })}
               </Paper>
+              <BottomBar
+                content={this.state.content}
+                handleContent={this.handleContent.bind(this)}
+                handleSubmit={this.handleSubmit.bind(this)}
+                nickname={this.state.nickname}
+              />
             </div>
       </div>
     );

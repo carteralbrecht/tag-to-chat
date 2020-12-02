@@ -635,13 +635,7 @@ class Dashboard extends Component {
               </IconButton>
             </Toolbar>
           </AppBar>
-          <Chat/>
-          <BottomBar
-              content={this.state.content}
-              handleContent={this.handleContent.bind(this)}
-              handleSubmit={this.handleSubmit.bind(this)}
-              nickname={this.state.nickname}
-          />
+          <Chat />
         </Dialog>
       </MuiThemeProvider>
     );

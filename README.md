@@ -8,6 +8,14 @@ tagToChat is a real-time chat application for talking with others who share simi
 ![smartmockups_kn6vo86w](https://user-images.githubusercontent.com/50386308/113805152-00a47600-972e-11eb-969c-941938e5bf18.png)
 
 
+## Features
+- Rooms are discoverable through 'tags' (ex: "sports", "stocks")
+- Chat with other users in real-time
+- Create new chat rooms (public and private) with your own tags
+- Share private rooms through unique join codes
+- Choose between the cross-platform mobile application or the tagToChat web application
+
+
 ## Technologies used
 - Express
 - Node
@@ -17,9 +25,4 @@ tagToChat is a real-time chat application for talking with others who share simi
 - React
 - React Native ​
 
-## Features
-- Rooms are discoverable through 'tags' (ex: "sports", "stocks")
-- Chat with other users in real-time
-- Create new chat rooms (public and private) with your own tags
-- Share private rooms through unique join codes
-- Choose between the cross-platform mobile application or the tagToChat web application
+
